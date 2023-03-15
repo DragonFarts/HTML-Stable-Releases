@@ -68,10 +68,11 @@
         oscillator.frequency.value = frequency * appyadd;
         return oscillator;
       }
-      const stepSequence = [1, 1.15, 1.3, 1.45, 1.6, 1.75, 1.9, 1.75, 1.6, 1.45, 1.3, 1.15, 1]; // step values
-      const timeIncrements = [250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250]; // time increments
-//      const stepSequence = [1]; // step values
-//      const timeIncrements = [250]; // time increments
+      // ENABLE this for step sequencer test
+//      const stepSequence = [1, 1.15, 1.3, 1.45, 1.6, 1.75, 1.9, 1.75, 1.6, 1.45, 1.3, 1.15, 1]; // step values
+//      const timeIncrements = [250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250]; // time increments
+      const stepSequence = [1]; // step values
+      const timeIncrements = [250]; // time increments
       let currentStepIndex = 0;
       let currentStepTime = 0;
 
