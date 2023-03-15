@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Roller Coaster Generator and Rider</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <script>
+    // Set up the scene, camera, and renderer
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Editable variables for the three sine waves
+    var xSineWaveAmplitude = 10; // amplitude of x position sine wave
+    var xSineWaveFrequency = 0.1; // frequency of x position sine wave
+    var xSineWave2Amplitude = 7; // amplitude of 2nd x position sine wave
+    var xSineWave2Frequency = 0.3; // frequency of 2nd x position sine wave
+    var xSineWave3Amplitude = 5; // amplitude of 3rd x position sine wave
+    var xSineWave3Frequency = 0.2; // frequency of 3rd x position sine wave
+    var ySineWaveAmplitude = 5; // amplitude of y position sine wave
+    var ySineWaveFrequency = 0.2; // frequency of y position sine wave
+    var ySineWave2Amplitude = 3; // amplitude of 2nd y position sine wave
+    var ySineWave2Frequency = 0.4; // frequency of 2nd y position sine wave
+    var ySineWave3Amplitude = 2; // amplitude of 3rd y position sine wave
+    var ySineWave3Frequency = 0.1; // frequency of 3rd y position sine wave
+    var yRotationSineWaveAmplitude = 2; // amplitude of y rotation sine wave
+    var yRotationSineWaveFrequency = 0.05; // frequency of y rotation sine wave
+    var xRotationSineWaveAmplitude = 2; // amplitude of x rotation sine wave
+    var xRotationSineWaveFrequency = 0.05; // frequency of x rotation sine wave
+    var zRotationSineWaveAmplitude = 2; // amplitude of z rotation sine wave
+    var zRotationSineWaveFrequency = 0.05; // frequency of z rotation sine wave
+
+    // Editable variables for cube dimensions
+    var cubeDimensionsX = 0.3; // dimension of cube on the x-axis
+    var cubeDimensionsY = 0.3; // dimension of cube on the y-axis
+    var cubeDimensionsZ = 0.3; // dimension of cube on the z-axis
+
+    // Create variables to store the current position of the sine waves
+    var xSineWavePosition = 0;
+    var ySineWavePosition = 0;
+
+    // Create variables to store the current position of each rotation sine wave
+    var yRotationPosition = 0;
+    var xRotationPosition = 0;
+    var zRotationPosition = 0;
+
+    // Declare variables to store the current mouse position
+    var mouseX = 0;
+    var mouseY = 0;
+
+    // Create a function that creates a new wireframe and adds it to the scene
+    function createWireframe() {
+      // Create a new wireframe
+      var geometry = new THREE.BoxGeometry(cubeDimensionsX, cubeDimensionsY, cubeDimensionsZ);
+      var edges = new THREE.EdgesGeometry(geometry);
+      var material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+      var wireframe = new THREE.LineSegments(edges, material);
+      wireframe.position.z = -100;
+      wireframe.position.x = Math.sin(xSineWavePosition) * xSineWaveAmplitude +
+                             Math.sin(xSineWavePosition * xSineWave2Frequency) * xSineWave2Amplitude +
+                             Math.sin(xSineWavePosition * xSineWave3Frequency) * xSineWave3Amplitude;
+      wireframe.position.y = Math.sin(ySineWavePosition * 2) * ySineWaveAmplitude +
+                             Math.sin(ySineWavePosition * 2 * ySineWave2Frequency) * ySineWave2Amplitude +
+                             Math.sin(ySineWavePosition * 2 * ySineWave3Frequency) * ySineWave3Amplitude;
+      wireframe.rotation.x = Math.sin(xRotationPosition) * xRotationSineWaveAmplitude;
+      wireframe.rotation.y = Math.sin(yRotationPosition) * yRotationSineWaveAmplitude;
+      wireframe.rotation.z = Math.sin(zRotationPosition) * zRotationSineWaveAmplitude;
+
+      // Create cubes to the left and right of the wireframe
+      var numCubes = 1; // Start with 2 cubes
+      var cubeSpacing = 0.3; // Spacing between cubes
+
+      for (var i = -numCubes; i <= numCubes; i++) {
+        var cube = new THREE.Mesh(geometry, material);
+        cube.position.x = i * cubeSpacing + wireframe.position.x;
+        cube.position.y = wireframe.position.y;
+        cube.position.z = wireframe.position.z;
+        cube.rotation.x = wireframe.rotation.x;
+        cube.rotation.y = wireframe.rotation.y;
+        cube.rotation.z = wireframe.rotation.z;
+        var cubeEdges = new THREE.EdgesGeometry(geometry);
+        var cubeWireframe = new THREE.LineSegments(cubeEdges, material);
+        cubeWireframe.position.copy(cube.position);
+        cubeWireframe.rotation.copy(cube.rotation);
+        scene.add(cubeWireframe);
+      }
+
+      scene.add(wireframe);
+
+      // Set initial rotation of wireframe based on sine wave
+      wireframe.rotation.z = Math.sin(xSineWavePosition) * 2;
+
+      return wireframe;
+    }
+
+
+    // Add variables to control the speed of the wireframes and camera
+    var xSpeed = 0.0375;
+    var ySpeed = 0.0375;
+    var cameraSpeed = 0.021; // set the camera movement speed
+    var xOffset = 0; // set the X offset for the camera movement
+    var yOffset = -2.5; // set the Y offset for the camera movement
+
+    // Set up a timer to create a new wireframe every 2 seconds
+    setInterval(function() {
+      xSineWavePosition += xSineWaveFrequency;
+      ySineWavePosition += ySineWaveFrequency;
+      yRotationPosition += yRotationSineWaveFrequency;
+      xRotationPosition += xRotationSineWaveFrequency;
+      zRotationPosition += zRotationSineWaveFrequency;
+      createWireframe();
+    }, 216);
+
+    // Set up a timer to update the position and rotation of the wireframes every 5 milliseconds
+    setInterval(function() {
+      scene.children.forEach(function(wireframe) {
+        wireframe.position.z += xSpeed;
+        wireframe.position.y += ySpeed;
+      });
+      yRotationPosition += yRotationSineWaveFrequency;
+      xRotationPosition += xRotationSineWaveFrequency;
+      zRotationPosition += zRotationSineWaveFrequency;
+    }, 5);
+
+    // Add an event listener to the document to detect when the mouse moves
+    document.addEventListener('mousemove', function(event) {
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = (event.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    // Create a function to move the camera to the closest cube in front of the camera
+    function moveCameraToClosestCube() {
+      var closestCube = null;
+      var closestDistance = Infinity;
+      var angleThreshold = Math.PI / 4; // set the angle threshold to 45 degrees
+
+      scene.children.forEach(function(wireframe) {
+        if (wireframe instanceof THREE.LineSegments) { // only consider wireframes created by createWireframe()
+          var distance = camera.position.distanceTo(wireframe.position);
+          var angle = camera.getWorldDirection(new THREE.Vector3()).angleTo(wireframe.position.clone().sub(camera.position).normalize());
+
+          // only consider wireframes within the angle threshold and in front of the camera
+          if (angle < angleThreshold && distance < closestDistance) {
+            closestDistance = distance;
+            closestCube = wireframe;
+          }
+        }
+      });
+
+      if (closestCube) {
+        camera.position.x += (closestCube.position.x - camera.position.x - xOffset) * cameraSpeed;
+        camera.position.y += (closestCube.position.y - camera.position.y - yOffset) * cameraSpeed;
+      }
+    }
+
+
+    // Call the moveCameraToClosestCube() function every frame to update the camera position
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Update the camera's rotation based on mouse position
+      camera.rotation.x = -(mouseY * Math.PI / 2)*0.2;
+      camera.rotation.y = -(mouseX * Math.PI / 2)*0.8;
+
+      moveCameraToClosestCube();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
