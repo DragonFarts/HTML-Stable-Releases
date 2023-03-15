@@ -278,11 +278,11 @@
                     ctx.translate(c.width / 2, c.height / 2);
                     ctx.rotate((i + l * 120) * Math.PI / 180);
                     ctx.translate(-c.width / 2, -c.height / 2);
-                    for (let j = 0; j < 250; j += p.shapeInc) {
+                    for (let j = 0; j < 216; j += p.shapeInc) {
                         const x = j * Math.cos(t / p.waveSpeed + j) + p.xPosMult * Math.sin(t / 100);
                         const y = j * Math.sin(t / p.waveSpeed + j) + p.yPosMult * Math.cos(t / 100);
                         ctx.fillStyle = `hsl(${(t * (1 + l / p.waveMult) + j) % 360}, 100%, 50%)`;
-                        const r = (Math.sin(t / p.waveMult) + 1) * p.baseRadius;
+                        const r = (Math.sin(t / p.waveMult) + 2) * p.baseRadius;
                         ctx.beginPath();
                         ctx.arc(c.width / 2 + x, c.height / 2 + y, r, 0, Math.PI * 2);
                         ctx.fill();
