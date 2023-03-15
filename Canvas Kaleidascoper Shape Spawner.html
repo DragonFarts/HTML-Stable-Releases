@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas Example</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas1" width="1000" height="1000"></canvas>
+    <canvas id="canvas2" width="1000" height="1000"></canvas>
+    <script>
+        const canvas1 = document.getElementById("canvas1");
+        const ctx1 = canvas1.getContext("2d");
+
+        let canvasCenterX = canvas1.width / 2; // x-coordinate of the canvas center
+        let canvasCenterY = canvas1.height / 2; // y-coordinate of the canvas center
+
+        // Define a Shape class to store the properties of each shape
+        class Shape {
+            constructor() {
+                // Initialize the properties of the shape
+                this.sides = Math.floor(Math.random() * 4) + 3;
+                this.size = 50;
+                this.speed = 0.03;
+                this.color = "black";
+                this.x = Math.floor(Math.random() * canvas1.width);
+                this.y = Math.floor(Math.random() * canvas1.height);
+                this.lineThickness = Math.floor(Math.random() * 4) + 1;
+                this.rotationAngle = 0;
+
+                // Generate random initial movement direction for the shape
+                let angle = Math.random() * 360; // random angle in degrees
+                let radians = angle * Math.PI / 180; // convert angle to radians
+                let speed = 0.2; // change this to adjust the speed of movement
+                this.dx = Math.cos(radians) * speed;
+                this.dy = Math.sin(radians) * speed;
+
+                // Randomly multiply the amplitude and timing of the sine waves by a factor between 0.5 and 3
+                const amplitudeFactor = Math.random() * 4 + 0.05;
+                const timingFactor = Math.random() * 0.5 + 0.05;
+
+                // Update the size and position of the shape based on the new factors
+                this.size *= amplitudeFactor;
+                this.x += 150 * amplitudeFactor;
+                this.y += 150 * timingFactor;
+                
+                // Update the speed of the rotation angle based on the new factors
+                this.speed *= timingFactor;
+
+                // Generate random sine wave properties for the shape's movement
+                this.xAmplitude = Math.random() * 100 + 150;
+                this.xFrequency = Math.random() * 0.01 + 0.1;
+                this.yAmplitude = Math.random() * 100 + 150;
+                this.yFrequency = Math.random() * 0.01 + 0.1;
+            }
+
+            // Define a method to draw the shape
+            draw() {
+                ctx1.save();
+
+                // Calculate the new position of the shape based on sine waves
+                this.x = canvasCenterX + this.xAmplitude * Math.sin(this.rotationAngle * this.xFrequency);
+                this.y = canvasCenterY + this.yAmplitude * Math.sin(this.rotationAngle * this.yFrequency);
+
+                // Move the shape in its current direction
+                this.x += this.dx;
+                this.y += this.dy;
+
+                // Calculate the new size of the shape based on a sine wave
+                this.size = 1000 * Math.sin(this.rotationAngle * Math.PI / 180);
+
+                // Draw the shape with the new size
+                ctx1.translate(this.x, this.y);
+                ctx1.rotate(this.rotationAngle * Math.PI / 180);
+                ctx1.strokeStyle = this.color;
+                ctx1.lineWidth = this.lineThickness;
+
+                // Draw the shape based on the random number of sides
+                ctx1.beginPath();
+                const angle = 2 * Math.PI / this.sides;
+                const radius = this.size / 2;
+                for (let i = 0; i < this.sides; i++) {
+                    const xPos = radius * Math.cos(i * angle);
+                    const yPos = radius * Math.sin(i * angle);
+                    ctx1.lineTo(xPos, yPos);
+                }
+                ctx1.closePath();
+                ctx1.stroke();
+
+                ctx1.restore();
+
+                // Update the rotation angle
+                this.rotationAngle += this.speed;
+                if (this.rotationAngle >= 360) {
+                    this.rotationAngle = 0;
+                }
+            }
+        }
+
+        // Create an array to store the shapes
+        const shapes = [];
+
+        // Define a function to create a new shape and add it to the array
+        function createShape() {
+            const shape = new Shape();
+            shapes.push(shape);
+        }
+
+        // Call the createShape function every 1080ms to create a new shape
+        setInterval(createShape, 10800);
+
+        // Define a function to draw all the shapes in the array
+        function drawShapes() {
+            ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+
+            shapes.forEach(shape => {
+                shape.draw();
+            });
+        }
+
+        // Call the function to start the animation loop
+        setInterval(drawShapes, 10);
+
+
+        const canvas2 = document.getElementById("canvas2");
+        const ctx2 = canvas2.getContext("2d");
+
+        let rotationAngle2 = 0; // default value
+        let mirrors = 6;
+
+        // Define a function to draw the mirrored and rotated image
+        function drawRotatedImage() {
+            const centerX = canvas2.width / 2;
+            const centerY = canvas2.height / 2;
+
+            ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+            ctx2.save();
+            ctx2.translate(centerX, centerY);
+            ctx2.rotate(rotationAngle2 * Math.PI / 180);
+            ctx2.scale(-1, 1);
+            ctx2.drawImage(canvas1, -canvas1.width / 2, -canvas1.height / 2, canvas1.width, canvas1.height);
+            ctx2.rotate(Math.PI);
+            ctx2.drawImage(canvas1, -canvas1.width / 2, -canvas1.height / 2, canvas1.width, canvas1.height);
+            ctx2.scale(-1, 1);
+            ctx2.restore();
+
+            // Update the rotation angle
+            rotationAngle2 += 360 / mirrors;
+            if (rotationAngle2 >= 360) {
+                rotationAngle2 = 0;
+            }
+        }
+
+        // Define a function to clear and redraw canvas2 every 100ms
+        function updateCanvas() {
+            for (let i = 0; i < canvas2.width; i += canvas1.width) {
+                for (let j = 0; j < canvas2.height; j += canvas1.height) {
+                    for (let a = 0; a < mirrors; a++) {
+                        const centerX = i + canvas1.width / 2;
+                        const centerY = j + canvas1.height / 2;
+                        ctx2.save();
+                        ctx2.translate(centerX, centerY);
+                        ctx2.rotate((a * 360 / mirrors) * Math.PI / 180);
+                        ctx2.scale(-1, 1);
+                        ctx2.drawImage(canvas1, -canvas1.width / 2, -canvas1.height / 2, canvas1.width, canvas1.height);
+                        ctx2.scale(-1, 1);
+                        ctx2.restore();
+                    }
+                }   
+            }
+
+            setTimeout(() => {
+                drawRotatedImage();
+                updateCanvas();
+            }, 1);
+        }
+
+        // Call the functions to start the animation loop
+        drawRotatedImage();
+        updateCanvas();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Psychedelic Wave Animation</title>
+    <style>
+      canvas {
+        width: 1000px;
+        height: 500px;
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+    <div>
+      <label for="amplitude">Amplitude:</label>
+      <input type="number" id="amplitude" value="13">
+    </div>
+    <div>
+      <label for="frequency">Frequency:</label>
+      <input type="number" id="frequency" step="0.01" value="0.02">
+    </div>
+    <div>
+      <label for="speed">Speed:</label>
+      <input type="number" id="speed" step="0.01" value="0.005">
+    </div>
+    <div>
+      <label for="phase">Phase:</label>
+      <input type="number" id="phase" step="0.01" value="0">
+    </div>
+    <div>
+      <label for="spiralFactor">Spiral Factor:</label>
+      <input type="number" id="spiralFactor" step="0.01" value="0.03">
+    </div>
+    <div>
+        <label for="lineWidth">Line Width:</label>
+        <input type="number" id="lineWidth" step="0.01" value="2">
+      </div>
+
+      <div>
+        <label for="spacey1">Space 1:</label>
+        <input type="number" id="spacey1" step="1" value="0">
+      </div>
+      <div>
+        <label for="spacey2">Space 2:</label>
+        <input type="number" id="spacey2" step="1" value="5">
+      </div>
+      <div>
+        <label for="farty1">fart 1:</label>
+        <input type="number" id="farty1" step="1" value="0">
+      </div>
+      <div>
+        <label for="farty2">fart 2:</label>
+        <input type="number" id="farty2" step="1" value="5">
+      </div>
+      
+      
+    <button id="updateButton">Update</button>
+    <script>
+      // Get the canvas element and its context
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // Set up the wave parameters
+      let wave = {
+        amplitude: 5,
+        frequency: 0.07,
+        speed: 0.01,
+        phase: 0,
+        spiralFactor: 0.02,
+      };
+
+      let spacey1 = 0;
+      let spacey2 = 5;
+      let farty1 = 0;
+      let farty2 = 5;
+
+      // Set up the animation loop
+      function animate() {
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the wave
+        for (let x = canvas.width; x >= spacey1; x -= spacey2) {
+          const phaseShift = (canvas.width - x) * wave.spiralFactor;
+//       RGB VERSION
+          const hue = (wave.phase + phaseShift) * 30 % 360;
+          ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+//       B&W VERSION
+//          const hue = (wave.phase + phaseShift) * 10 % 360;
+//          ctx.strokeStyle = `rgb(${hue}, ${hue}, ${hue})`;
+
+
+          ctx.beginPath();
+          let prevX, prevY, linelength;
+          for (let y = farty1; y < canvas.height; y += farty2) {
+            const spiralX = x + wave.amplitude * Math.sin(wave.frequency * y + wave.phase + phaseShift);
+            const spiralY = y + wave.amplitude * Math.cos(wave.frequency * y + wave.phase + phaseShift);
+            if (prevX !== undefined && prevY !== undefined) {
+              linelength = Math.sqrt((spiralX - prevX) ** 2 + (spiralY - prevY) ** 2);
+
+              ctx.lineWidth = parseFloat(document.getElementById("lineWidth").value) || lineWidth;
+              ctx.lineTo(spiralX, spiralY);
+            }
+            prevX = spiralX;
+            prevY = spiralY;
+          }
+          ctx.stroke();
+        }
+
+        // Update the wave parameters
+        wave.phase += wave.speed;
+
+        // Request the next animation frame
+        requestAnimationFrame(animate);
+      }
+
+      // Start the animation loop
+      animate();
+
+      // Update the wave parameters when the button is clicked
+      const updateButton = document.getElementById("updateButton");
+      updateButton.addEventListener("click", function () {
+        wave = {
+          amplitude: parseFloat(document.getElementById("amplitude").value),
+          frequency: parseFloat(document.getElementById("frequency").value),
+          speed: parseFloat(document.getElementById("speed").value),
+          phase: parseFloat(document.getElementById("phase").value),
+          spiralFactor: parseFloat(document.getElementById("spiralFactor").value),
+        };
+        spacey1 = parseFloat(document.getElementById("spacey1").value);
+        spacey2 = parseFloat(document.getElementById("spacey2").value);
+        farty1 = parseFloat(document.getElementById("farty1").value);
+        farty2 = parseFloat(document.getElementById("farty2").value);
+      });
+    </script>
+  </body>
+</html>
