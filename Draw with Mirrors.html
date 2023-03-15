@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Draw with Mirror Mode</title>
+  <style>
+    canvas {
+      border: 2px solid black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas" width="500" height="500"></canvas>
+  <br>
+  <label>Color:</label>
+  <input id="colorInput" type="color" value="#000000">
+  <br>
+  <label>Pixel Size:</label>
+  <input id="pixelSizeInput" type="number" min="1" max="50" value="3">
+  <br>
+  <label>
+    <input id="horizontalMirrorModeCheckbox" type="checkbox"> Horizontal Mirror Mode
+  </label>
+  <br>
+  <label>Horizontal Mirror Angle (degrees):</label>
+  <input id="mirrorAngleInput" type="number" min="0" max="360" value="0" disabled>
+  <br>
+  <label>Horizontal Mirror X Position:</label>
+  <input id="mirrorXInput" type="number" min="0" max="500" value="250" disabled>
+  <br>
+  <label>Horizontal Mirror Y Position:</label>
+  <input id="mirrorYInput" type="number" min="0" max="500" value="250" disabled>
+  <br>
+  <label>
+    <input id="verticalMirrorModeCheckbox" type="checkbox"> Vertical Mirror Mode
+  </label>
+  <br>
+  <label>Vertical Mirror Angle (degrees):</label>
+  <input id="verticalMirrorAngleInput" type="number" min="0" max="360" value="0" disabled>
+  <br>
+  <label>Vertical Mirror X Position:</label>
+  <input id="verticalMirrorXInput" type="number" min="0" max="500" value="250" disabled>
+  <br>
+  <label>Vertical Mirror Y Position:</label>
+  <input id="verticalMirrorYInput" type="number" min="0" max="500" value="250" disabled>
+  <br>
+  <label>
+    <input id="circularMirrorModeCheckbox" type="checkbox"> Circular Mirror Mode
+  </label>
+  <br>
+  <label>Number of Mirrors:</label>
+  <input id="numMirrorsInput" type="number" min="1" max="12" value="6" enabled>
+  
+  <br>
+  <label>Circular Mirror Angle (degrees):</label>
+  <input id="circularMirrorAngleInput" type="number" min="0" max="360" value="0" disabled>
+  <br>
+  <label>Circular Mirror X Position:</label>
+  <input id="circularMirrorXInput" type="number" min="0" max="500" value="250" disabled>
+  <br>
+  <label>Circular Mirror Y Position:</label>
+  <input id="circularMirrorYInput" type="number" min="0" max="500" value="250" disabled>
+  <br>
+  <button id="clearButton">Clear Canvas</button>
+
+  <script>
+    window.onload = function() {
+      var canvas = document.getElementById("myCanvas");
+      var context = canvas.getContext("2d");
+      var drawing = false;
+      var horizontalMirrorMode = false;
+      var horizontalMirrorAngle = 0;
+      var horizontalMirrorX = 250;
+      var horizontalMirrorY = 250;
+      var verticalMirrorMode = false;
+      var verticalMirrorAngle = 0;
+      var verticalMirrorX = 250;
+      var verticalMirrorY = 250;
+      var circularMirrorMode = false;
+      var numMirrors = 6;
+      var circularMirrorAngle = 0;
+
+
+      
+      var circularMirrorX = 250;
+      var circularMirrorY = 250;
+      var clearButton = document.getElementById("clearButton");
+      clearButton.addEventListener("click", function() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+      });
+      
+
+      canvas.addEventListener("mousedown", function(event) {
+        drawing = true;
+        draw(event);
+      });
+
+      canvas.addEventListener("mousemove", function(event) {
+        if (drawing) {
+          draw(event);
+        }
+      });
+
+      canvas.addEventListener("mouseup", function(event) {
+        drawing = false;
+      });
+
+      function draw(event) {
+        var x = event.clientX - canvas.offsetLeft;
+        var y = event.clientY - canvas.offsetTop;
+        var color = document.getElementById("colorInput").value;
+        var pixelSize = parseInt(document.getElementById("pixelSizeInput").value);
+        
+
+        if (horizontalMirrorMode && verticalMirrorMode && circularMirrorMode) {
+          drawHorizontalMirror(x, y, color, pixelSize);
+          drawVerticalMirror(x, y, color, pixelSize);
+
+          for (var i = 0; i < numMirrors; i++) {
+            var angle = (i * 360 / numMirrors + circularMirrorAngle) * Math.PI / 180;
+            var x1 = x - circularMirrorX;
+            var y1 = y - circularMirrorY;
+            var x2 = x1 * Math.cos(angle) + y1 * Math.sin(angle) + circularMirrorX;
+            var y2 = -x1 * Math.sin(angle) + y1 * Math.cos(angle) + circularMirrorY;
+            drawCircularMirror(x2, y2, color, pixelSize);
+          }
+        } else if (horizontalMirrorMode && verticalMirrorMode) {
+          drawHorizontalMirror(x, y, color, pixelSize);
+          drawVerticalMirror(x, y, color, pixelSize);
+          drawHorizontalMirror(x, 2 * verticalMirrorY - y, color, pixelSize);
+          drawVerticalMirror(2 * horizontalMirrorX - x, y, color, pixelSize);
+        } else if (horizontalMirrorMode && circularMirrorMode) {
+          drawHorizontalMirror(x, y, color, pixelSize);
+          for (var i = 0; i < numMirrors; i++) {
+            var angle = (i * 360 / numMirrors + circularMirrorAngle) * Math.PI / 180;
+            var x1 = x - circularMirrorX;
+            var y1 = y - circularMirrorY;
+            var x2 = x1 * Math.cos(angle) + y1 * Math.sin(angle) + circularMirrorX;
+            var y2 = -x1 * Math.sin(angle) + y1 * Math.cos(angle) + circularMirrorY;
+            drawCircularMirror(x2, y2, color, pixelSize);
+          }
+        } else if (verticalMirrorMode && circularMirrorMode) {
+          drawVerticalMirror(x, y, color, pixelSize);
+          for (var i = 0; i < numMirrors; i++) {
+            var angle = (i * 360 / numMirrors + circularMirrorAngle) * Math.PI / 180;
+            var x1 = x - circularMirrorX;
+            var y1 = y - circularMirrorY;
+            var x2 = x1 * Math.cos(angle) + y1 * Math.sin(angle) + circularMirrorX;
+            var y2 = -x1 * Math.sin(angle) + y1 * Math.cos(angle) + circularMirrorY;
+            drawCircularMirror(x2, y2, color, pixelSize);
+          }
+        } else if (horizontalMirrorMode) {
+          drawHorizontalMirror(x, y, color, pixelSize);
+        } else if (verticalMirrorMode) {
+          drawVerticalMirror(x, y, color, pixelSize);
+        } else if (circularMirrorMode) {
+          for (var i = 0; i < numMirrors; i++) {
+            var angle = (i * 360 / numMirrors + circularMirrorAngle) * Math.PI / 180;
+            var x1 = x - circularMirrorX;
+            var y1 = y - circularMirrorY;
+            var x2 = x1 * Math.cos(angle) + y1 * Math.sin(angle) + circularMirrorX;
+            var y2 = -x1 * Math.sin(angle) + y1 * Math.cos(angle) + circularMirrorY;
+            drawCircularMirror(x2, y2, color, pixelSize);
+          }
+        } else {
+          context.fillStyle = color;
+          context.fillRect(x, y, pixelSize, pixelSize);
+        }
+      }
+
+      function drawHorizontalMirror(x, y, color, pixelSize) {
+        var angle = horizontalMirrorAngle * Math.PI / 180;
+        var x1 = x - horizontalMirrorX;
+        var y1 = y - horizontalMirrorY;
+        var x2 = x1 * Math.cos(angle) - y1 * Math.sin(angle) + horizontalMirrorX;
+        var y2 = x1 * Math.sin(angle) + y1 * Math.cos(angle) + horizontalMirrorY;
+        var x3 = 2 * horizontalMirrorX - x2;
+        var y3 = y2;
+        context.fillStyle = color;
+        context.fillRect(x2, y2, pixelSize, pixelSize);
+        context.fillRect(x3, y3, pixelSize, pixelSize);
+      }
+
+      function drawVerticalMirror(x, y, color, pixelSize) {
+        var angle = verticalMirrorAngle * Math.PI / 180;
+        var x1 = x - verticalMirrorX;
+        var y1 = y - verticalMirrorY;
+        var x2 = x1 * Math.cos(angle) + y1 * Math.sin(angle) + verticalMirrorX;
+        var y2 = -x1 * Math.sin(angle) + y1 * Math.cos(angle) + verticalMirrorY;
+        var x3 = x2;
+        var y3 = 2 * verticalMirrorY - y2;
+        context.fillStyle = color;
+        context.fillRect(x2, y2, pixelSize, pixelSize);
+        context.fillRect(x3, y3, pixelSize, pixelSize);
+      }
+
+      function drawCircularMirror(x, y, color, pixelSize) {
+        var angle = circularMirrorAngle * Math.PI / 180;
+        var x1 = x - circularMirrorX;
+        var y1 = y - circularMirrorY;
+        var x2 = x1 * Math.cos(angle) + y1 * Math.sin(angle) + circularMirrorX;
+        var y2 = -x1 * Math.sin(angle) + y1 * Math.cos(angle) + circularMirrorY;
+        var x3 = 2 * circularMirrorX - x2;
+        var y3 = 2 * circularMirrorY - y2;
+        context.fillStyle = color;
+        context.fillRect(x2, y2, pixelSize, pixelSize);
+        context.fillRect(x3, y3, pixelSize, pixelSize);
+      }
+
+      var horizontalMirrorModeCheckbox = document.getElementById("horizontalMirrorModeCheckbox");
+      horizontalMirrorModeCheckbox.addEventListener("change", function() {
+        horizontalMirrorMode = horizontalMirrorModeCheckbox.checked;
+        var mirrorAngleInput = document.getElementById("mirrorAngleInput");
+        var mirrorXInput = document.getElementById("mirrorXInput");
+        var mirrorYInput = document.getElementById("mirrorYInput");
+        mirrorAngleInput.disabled = !horizontalMirrorMode;
+        mirrorXInput.disabled = !horizontalMirrorMode;
+        mirrorYInput.disabled = !horizontalMirrorMode;
+      });
+
+      var verticalMirrorModeCheckbox = document.getElementById("verticalMirrorModeCheckbox");
+      verticalMirrorModeCheckbox.addEventListener("change", function() {
+        verticalMirrorMode = verticalMirrorModeCheckbox.checked;
+        var verticalMirrorAngleInput = document.getElementById("verticalMirrorAngleInput");
+        var verticalMirrorXInput = document.getElementById("verticalMirrorXInput");
+        var verticalMirrorYInput = document.getElementById("verticalMirrorYInput");
+        verticalMirrorAngleInput.disabled = !verticalMirrorMode;
+        verticalMirrorXInput.disabled = !verticalMirrorMode;
+        verticalMirrorYInput.disabled = !verticalMirrorMode;
+      });
+
+      var circularMirrorModeCheckbox = document.getElementById("circularMirrorModeCheckbox");
+      circularMirrorModeCheckbox.addEventListener("change", function() {
+        circularMirrorMode = circularMirrorModeCheckbox.checked;
+        var numMirrorsInput = document.getElementById("numMirrorsInput");
+        var circularMirrorAngleInput = document.getElementById("circularMirrorAngleInput");
+        var circularMirrorXInput = document.getElementById("circularMirrorXInput");
+        var circularMirrorYInput = document.getElementById("circularMirrorYInput");
+        numMirrorsInput.disabled = !circularMirrorMode;
+        circularMirrorAngleInput.disabled = !circularMirrorMode;
+        circularMirrorXInput.disabled = !circularMirrorMode;
+        circularMirrorYInput.disabled = !circularMirrorMode;
+      });
+
+      var mirrorAngleInput = document.getElementById("mirrorAngleInput");
+      mirrorAngleInput.addEventListener("change", function(event) {
+        horizontalMirrorAngle = parseInt(event.target.value);
+      });
+
+      var mirrorXInput = document.getElementById("mirrorXInput");
+      mirrorXInput.addEventListener("change", function(event) {
+        horizontalMirrorX = parseInt(event.target.value);
+      });
+
+      var mirrorYInput = document.getElementById("mirrorYInput");
+      mirrorYInput.addEventListener("change", function(event) {
+        horizontalMirrorY = parseInt(event.target.value);
+      });
+
+      var verticalMirrorAngleInput = document.getElementById("verticalMirrorAngleInput");
+      verticalMirrorAngleInput.addEventListener("change", function(event) {
+        verticalMirrorAngle = parseInt(event.target.value);
+      });
+
+      var verticalMirrorXInput = document.getElementById("verticalMirrorXInput");
+      verticalMirrorXInput.addEventListener("change", function(event) {
+        verticalMirrorX = parseInt(event.target.value);
+      });
+
+      var verticalMirrorYInput = document.getElementById("verticalMirrorYInput");
+      verticalMirrorYInput.addEventListener("change", function(event) {
+        verticalMirrorY = parseInt(event.target.value);
+      });
+
+      var numMirrorsInput = document.getElementById("numMirrorsInput");
+      numMirrorsInput.addEventListener("change", function(event) {
+        numMirrors = parseInt(event.target.value);
+      });
+
+      var circularMirrorAngleInput = document.getElementById("circularMirrorAngleInput");
+      circularMirrorAngleInput.addEventListener("change", function(event) {
+        circularMirrorAngle = parseInt(event.target.value);
+      });
+
+      var circularMirrorXInput = document.getElementById("circularMirrorXInput");
+      circularMirrorXInput.addEventListener("change", function(event) {
+        circularMirrorX = parseInt(event.target.value);
+      });
+
+      var circularMirrorYInput = document.getElementById("circularMirrorYInput");
+      circularMirrorYInput.addEventListener("change", function(event) {
+        circularMirrorY = parseInt(event.target.value);
+      });
+
+     
+
+    };
+  </script>
+</body>
+</html>

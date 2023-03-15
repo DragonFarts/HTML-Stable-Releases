@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Psychedelic Waves</title>
+    <style>
+        canvas { display: block; }
+    </style>    
+</head>
+<body>
+    <button id="randomize">Randomize</button>    <button id="update">Update</button>
+    <canvas id="c" width="1000" height="500"></canvas>
+    
+    <br>
+    <label>
+        Layers:
+        <input type="number" id="layersInput" min="1" max="5" value="3">
+    </label>
+    <br>
+    <label>
+        Angle Increment:
+        <input type="number" id="angleIncInput" min="1" max="20" value="10">
+    </label>
+    <br>
+    <label>
+        Wave Speed:
+        <input type="number" id="waveSpeedInput" min="10" max="110" value="50">
+    </label>
+    <br>
+    <label>
+        Wave Multiplier:
+        <input type="number" id="waveMultInput" min="1" max="20" value="10">
+    </label>
+    <br>
+    <label>
+        Shape Increment:
+        <input type="number" id="shapeIncInput" min="1" max="10" value="5">
+    </label>
+    <br>
+    <label>
+        Base Radius:
+        <input type="number" id="baseRadiusInput" min="0.1" max="3" step="0.1" value="1.5">
+    </label>
+    <br>
+    <label>
+        Blur:
+        <input type="number" id="blurInput" min="0" max="0.2" step="0.01" value="0.1">
+    </label>
+    <br>
+    <label>
+        X Position Multiplier:
+        <input type="number" id="xPosMultInput" min="0" max="20" value="10">
+    </label>
+    <br>
+    <label>
+        Y Position Multiplier:
+        <input type="number" id="yPosMultInput" min="0" max="20" value="10">
+    </label>
+    <br>
+    
+    <label>
+        Randomize:
+        <br>
+        <input type="checkbox" id="layersRandomize" checked>
+        <label for="layersRandomize">Layers</label>
+        <br>
+        <input type="checkbox" id="angleIncRandomize" checked>
+        <label for="angleIncRandomize">Angle Increment</label>
+        <br>
+        <input type="checkbox" id="waveSpeedRandomize" checked>
+        <label for="waveSpeedRandomize">Wave Speed</label>
+        <br>
+        <input type="checkbox" id="waveMultRandomize" checked>
+        <label for="waveMultRandomize">Wave Multiplier</label>
+        <br>
+        <input type="checkbox" id="shapeIncRandomize" checked>
+        <label for="shapeIncRandomize">Shape Increment</label>
+        <br>
+        <input type="checkbox" id="baseRadiusRandomize" checked>
+        <label for="baseRadiusRandomize">Base Radius</label>
+        <br>
+        <input type="checkbox" id="blurRandomize" checked>
+        <label for="blurRandomize">Blur</label>
+        <br>
+        <input type="checkbox" id="xPosMultRandomize" checked>
+        <label for="xPosMultRandomize">X Position Multiplier</label>
+        <br>
+        <input type="checkbox" id="yPosMultRandomize" checked>
+        <label for="yPosMultRandomize">Y Position Multiplier</label>
+    </label>
+    <br>
+    
+    <label>
+<b>Randomizer Min/Max List</b>
+        <br>
+        <b>Layers</b>
+        <br>
+        ..min
+        <input type="number" id="minRandomValueLayers" min="1" max="5" value="1">
+        ..max
+        <input type="number" id="maxRandomValueLayers" min="1" max="5" value="5">
+        <br>
+        <b>Angle</b>
+        <br>
+        ..min
+        <input type="number" id="minRandomValueAngleInc" min="1" max="20" value="1">
+        ..max
+        <input type="number" id="maxRandomValueAngleInc" min="1" max="20" value="20">
+        <br>
+        <b>WaveSpeed</b>
+        <br>
+        ..min
+        <input type="number" id="minRandomValueWaveSpeed" min="10" max="110" value="10">
+        ..max
+        <input type="number" id="maxRandomValueWaveSpeed" min="10" max="110" value="110">
+        <br>
+        <b>WaveMulti</b>
+        <br>
+        ..min
+        <input type="number" id="minRandomValueWaveMult" min="1" max="20" value="1">
+        ..max
+        <input type="number" id="maxRandomValueWaveMult" min="1" max="20" value="20">
+        <br>
+        <b>ShapeInc</b>
+        <br>
+        ..min
+        <input type="number" id="minRandomValueShapeInc" min="1" max="10" value="1">
+        ..max
+        <input type="number" id="maxRandomValueShapeInc" min="1" max="10" value="10">
+        <br>
+        <b>BaseRadius</b>
+        <br>
+        ..min
+        <input type="number" id="minRandomValueBaseRadius" min="0.1" max="3" step="0.1" value="0.1">
+        ..max
+        <input type="number" id="maxRandomValueBaseRadius" min="0.1" max="3" step="0.1" value="3">
+        <br>
+        <b>Blur</b>
+        <br>
+        ..min
+        <input type="number" id="minRandomValueBlur" min="0" max="0.2" step="0.01" value="0">
+        ..max
+        <input type="number" id="maxRandomValueBlur" min="0" max="0.2" step="0.01" value="0.2">
+        <br>
+        <b>XposMulti</b>
+        <br>
+        ..min
+        <input type="number" id="minRandomValueXPosMult" min="0" max="20" value="0">
+        ..max
+        <input type="number" id="maxRandomValueXPosMult" min="0" max="20" value="20">
+        <br>
+        <b>YposMulti</b>
+        <br>
+        ..min
+        <input type="number" id="minRandomValueYPosMult" min="0" max="20" value="0">
+        ..max
+        <input type="number" id="maxRandomValueYPosMult" min="0" max="20" value="20">
+        <br>
+    </label>
+    <br>
+    
+    <br>
+    
+
+    
+    <p id="randomizedValues"></p>
+    
+    <script>
+        const c = document.getElementById('c');
+        const ctx = c.getContext('2d');
+        const randomizeBtn = document.getElementById('randomize');
+        const updateBtn = document.getElementById('update');
+        const randomizedValues = document.getElementById('randomizedValues');
+        
+        let t = 0;
+        
+        let p = {
+            layers: parseInt(document.getElementById('layersInput').value),
+            angleInc: parseInt(document.getElementById('angleIncInput').value),
+            waveSpeed: parseFloat(document.getElementById('waveSpeedInput').value),
+            waveMult: parseInt(document.getElementById('waveMultInput').value),
+            shapeInc: parseInt(document.getElementById('shapeIncInput').value),
+            baseRadius: parseFloat(document.getElementById('baseRadiusInput').value),
+            blur: parseFloat(document.getElementById('blurInput').value),
+            xPosMult: parseInt(document.getElementById('xPosMultInput').value),
+            yPosMult: parseInt(document.getElementById('yPosMultInput').value),
+        };
+        
+        const randomizeParams = () => {
+            let output = 'Randomized Values:<br>';
+            
+            if (document.getElementById('layersRandomize').checked) {
+                const min = parseInt(document.getElementById('minRandomValueLayers').value);
+                const max = parseInt(document.getElementById('maxRandomValueLayers').value);
+                p.layers = Math.floor(Math.random() * (max - min + 1)) + min;
+                output += `Layers: ${p.layers}<br>`;
+            }
+            if (document.getElementById('angleIncRandomize').checked) {
+                const min = parseInt(document.getElementById('minRandomValueAngleInc').value);
+                const max = parseInt(document.getElementById('maxRandomValueAngleInc').value);
+                p.angleInc = Math.floor(Math.random() * (max - min + 1)) + min;
+                output += `Angle Increment: ${p.angleInc}<br>`;
+            }
+            if (document.getElementById('waveSpeedRandomize').checked) {
+                const min = parseFloat(document.getElementById('minRandomValueWaveSpeed').value);
+                const max = parseFloat(document.getElementById('maxRandomValueWaveSpeed').value);
+                p.waveSpeed = Math.random() * (max - min) + min;
+                output += `Wave Speed: ${p.waveSpeed}<br>`;
+            }
+            if (document.getElementById('waveMultRandomize').checked) {
+                const min = parseInt(document.getElementById('minRandomValueWaveMult').value);
+                const max = parseInt(document.getElementById('maxRandomValueWaveMult').value);
+                p.waveMult = Math.floor(Math.random() * (max - min + 1)) + min;
+                output += `Wave Multiplier: ${p.waveMult}<br>`;
+            }
+            if (document.getElementById('shapeIncRandomize').checked) {
+                const min = parseInt(document.getElementById('minRandomValueShapeInc').value);
+                const max = parseInt(document.getElementById('maxRandomValueShapeInc').value);
+                p.shapeInc = Math.floor(Math.random() * (max - min + 1)) + min;
+                output += `Shape Increment: ${p.shapeInc}<br>`;
+            }
+            if (document.getElementById('baseRadiusRandomize').checked) {
+                const min = parseFloat(document.getElementById('minRandomValueBaseRadius').value);
+                const max = parseFloat(document.getElementById('maxRandomValueBaseRadius').value);
+                p.baseRadius = Math.random() * (max - min) + min;
+                output += `Base Radius: ${p.baseRadius}<br>`;
+            }
+            if (document.getElementById('blurRandomize').checked) {
+                const min = parseFloat(document.getElementById('minRandomValueBlur').value);
+                const max = parseFloat(document.getElementById('maxRandomValueBlur').value);
+                p.blur = Math.random() * (max - min) + min;
+                output += `Blur: ${p.blur}<br>`;
+            }
+            if (document.getElementById('xPosMultRandomize').checked) {
+                const min = parseInt(document.getElementById('minRandomValueXPosMult').value);
+                const max = parseInt(document.getElementById('maxRandomValueXPosMult').value);
+                p.xPosMult = Math.floor(Math.random() * (max - min + 1)) + min;
+                output += `X Position Multiplier: ${p.xPosMult}<br>`;
+            }
+            if (document.getElementById('yPosMultRandomize').checked) {
+                const min = parseInt(document.getElementById('minRandomValueYPosMult').value);
+                const max = parseInt(document.getElementById('maxRandomValueYPosMult').value);
+                p.yPosMult = Math.floor(Math.random() * (max - min + 1)) + min;
+                output += `Y Position Multiplier: ${p.yPosMult}<br>`;
+            }
+            
+            randomizedValues.innerHTML = output;
+        };
+        
+        const updateParams = () => {
+            p.layers = parseInt(document.getElementById('layersInput').value);
+            p.angleInc = parseInt(document.getElementById('angleIncInput').value);
+            p.waveSpeed = parseFloat(document.getElementById('waveSpeedInput').value);
+            p.waveMult = parseInt(document.getElementById('waveMultInput').value);
+            p.shapeInc = parseInt(document.getElementById('shapeIncInput').value);
+            p.baseRadius = parseFloat(document.getElementById('baseRadiusInput').value);
+            p.blur = parseFloat(document.getElementById('blurInput').value);
+            p.xPosMult = parseInt(document.getElementById('xPosMultInput').value);
+            p.yPosMult = parseInt(document.getElementById('yPosMultInput').value);
+        };
+        
+        randomizeBtn.addEventListener('click', () => {
+            randomizeParams();
+        });
+        
+        updateBtn.addEventListener('click', () => {
+            updateParams();
+            randomizeParams();
+        });
+        
+        const d = () => {
+            ctx.fillStyle = `rgba(0, 0, 0, ${p.blur})`;
+            ctx.fillRect(0, 0, c.width, c.height);
+
+            for (let l = 0; l < p.layers; l++) {
+                for (let i = 0; i < 360; i += p.angleInc) {
+                    ctx.save();
+                    ctx.translate(c.width / 2, c.height / 2);
+                    ctx.rotate((i + l * 120) * Math.PI / 180);
+                    ctx.translate(-c.width / 2, -c.height / 2);
+                    for (let j = 0; j < 250; j += p.shapeInc) {
+                        const x = j * Math.cos(t / p.waveSpeed + j) + p.xPosMult * Math.sin(t / 100);
+                        const y = j * Math.sin(t / p.waveSpeed + j) + p.yPosMult * Math.cos(t / 100);
+                        ctx.fillStyle = `hsl(${(t * (1 + l / p.waveMult) + j) % 360}, 100%, 50%)`;
+                        const r = (Math.sin(t / p.waveMult) + 1) * p.baseRadius;
+                        ctx.beginPath();
+                        ctx.arc(c.width / 2 + x, c.height / 2 + y, r, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+            }
+            
+            t += 1;
+            requestAnimationFrame(d);
+        };
+        
+        d();
+    </script>
+</body>
+</html>

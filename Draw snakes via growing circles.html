@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Circle Drawing</title>
+    <style>
+      canvas {
+        border: 3px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="1000" height="500"></canvas>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      let intervalId = null;
+      let radius = 0;
+      let mouseX = 0;
+      let mouseY = 0;
+      let GrowP = 0.000108;
+
+      // clear canvas once at the start
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      canvas.addEventListener('mousedown', (e) => {
+        mouseX = e.clientX - canvas.offsetLeft;
+        mouseY = e.clientY - canvas.offsetTop;
+
+        intervalId = setInterval(() => {
+          radius += canvas.width * GrowP;
+          ctx.beginPath();
+          ctx.arc(mouseX, mouseY, radius, 0, 2 * Math.PI, false);
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = 'black';
+          ctx.stroke();
+        }, 25);
+
+        canvas.addEventListener('mousemove', (e) => {
+          mouseX = e.clientX - canvas.offsetLeft;
+          mouseY = e.clientY - canvas.offsetTop;
+        });
+      });
+
+      canvas.addEventListener('mouseup', (e) => {
+        clearInterval(intervalId);
+        radius = 0;
+      });
+    </script>
+  </body>
+</html>
