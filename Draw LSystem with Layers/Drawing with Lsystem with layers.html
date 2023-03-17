@@ -1,0 +1,339 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Canvas Drawing</title>
+      <style>
+          canvas {
+              border: 1px solid black;
+          }
+          .row {
+              display: flex;
+              flex-wrap: wrap;
+          }
+          .row input {
+              margin-right: 5px;
+              width: 50px; /* set input field width to 200 pixels */
+              height: 10px;
+          
+          }
+          .row input[type="checkbox"] {
+              width: 20px;
+              height: 10px;
+          }
+      </style>
+  </head>
+  <body>
+      <canvas id="c" width="500" height="500"></canvas>
+
+
+      <button id="db">Draw</button>
+      <button id="clear">Clear Canvas</button>
+      <label for="preset">Presets:</label>
+      <select id="preset">
+          <option value="001">Square</option>
+          <option value="002">Triangle</option>
+          <option value="003">Circle</option>
+          <option value="004">Hexagon</option>
+          <option value="005">Cube</option>
+          <option value="006">Triangular Prism</option>
+
+      </select>
+
+      <br>
+      <br>
+      <button id="add">Add Row</button>
+      <br>
+      <br>
+      <button id="add-sequence">Add Here Rows</button>
+      <label for="sequence">Add Here Rows</label>
+      <input type="text" id="sequence" value="0, 1, 2">
+      <br>
+      <br>
+      <button id="add-sequence-of-rows">Add Preset Rows</button>
+      <label for="preset-sequence">Preset ID:</label>
+      <input type="text" id="preset-sequence" value="001">
+      <br>
+      <br>
+      <div id="rows">
+          <div class="row">
+              DP:<input class="dp" type="number" value="">
+              DP Add:<input class="dpadd" type="number" value="">
+              M:<input class="m" type="number" value="">
+              R:<input class="r" type="number" value="">
+              A2M:<input class="a2m" type="number" value="">
+              A2R:<input class="a2r" type="number" value="">
+              Rep:<input class="rep" type="number" value="">
+              MS:<input class="ms" type="number" value="">
+              Use:<input class="useStartX" type="checkbox">
+              X:<input class="startX" type="number" value="">
+              Use:<input class="useStartY" type="checkbox">
+              Y:<input class="startY" type="number" value="">
+              Use:<input class="useRot" type="checkbox">
+              R:<input class="rot" type="number" value="">
+              Color:<input class="color2" type="text" value="">
+          </div>
+      </div>
+
+
+
+
+      <script>
+          const presets = {
+            "001": [
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 0, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 90, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 180, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 270, 000000]
+            ],
+            "002": [
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, -60, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 60, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 180, 000000],
+            ],
+
+            "003": [
+              [2, 0, 1, 1, 0, 0, 1080, 0, false, 250, true, 250, true, 45, 000000]
+            ],
+
+            "004": [
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 0, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 60, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 120, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 180, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 240, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 300, 000000]
+            ],
+            "005": [
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 0, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 90, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 180, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 250, false, 250, true, 270, 000000],
+              [2, 0, 1, 0, 0, 0, 84, 0, false, 250, false, 250, true, 45, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 300, false, 300, true, 0, 000000],
+              [2, 0, 1, 0, 0, 0, 84, 0, false, 350, false, 350, true, 225, 000000],
+              [0, 0, 1, 0, 0, 0, 108, 0, false, 350, false, 350, true, 90, 000000],
+              [2, 0, 1, 0, 0, 0, 84, 0, false, 350, false, 350, true, 45, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 350, false, 350, true, 270, 000000],
+              [0, 0, 1, 0, 0, 0, 108, 0, false, 350, false, 350, true, 180, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 350, false, 350, true, 90, 000000],
+              [2, 0, 1, 0, 0, 0, 108, 0, false, 350, false, 350, true, 0, 000000],
+              [0, 0, 1, 0, 0, 0, 108, 0, false, 350, false, 350, true, 180, 000000],
+              [2, 0, 1, 0, 0, 0, 84, 0, false, 350, false, 350, true, 225, 000000]
+            ],
+            "006": [
+              [2, 0, 1, 0, 0, 0, 100, 0, false, 250, false, 250, true, 0, 000000],
+              [2, 0, 1, 0, 0, 0, 100, 0, false, 250, false, 250, true, 60, 000000],
+              [2, 0, 1, 0, 0, 0, 100, 0, false, 250, false, 250, true, 180, 000000],
+              [2, 0, 1, 0, 0, 0, 100, 0, false, 250, false, 250, true, 240, 000000],
+              [2, 0, 1, 0, 0, 0, 140, 0, false, 250, false, 250, true, 315, 000000],
+              [2, 0, 1, 0, 0, 0, 100, 0, false, 300, false, 300, true, 90, 000000],
+              [0, 0, 1, 0, 0, 0, 100, 0, false, 350, false, 350, true, 60, 000000],
+              [2, 0, 1, 0, 0, 0, 100, 0, false, 350, false, 350, true, 270, 000000],
+              [2, 0, 1, 0, 0, 0, 100, 0, false, 350, false, 350, true, 240, 000000],
+              [0, 0, 1, 0, 0, 0, 100, 0, false, 350, false, 350, true, 60, 000000],
+              [2, 0, 1, 0, 0, 0, 140, 0, false, 350, false, 350, true, 135, 000000],
+            ]
+
+
+
+
+          };
+          const addSequenceButton = document.getElementById("add-sequence");
+          addSequenceButton.addEventListener("click", addRowsFromSequence);
+
+          const addSequenceOfRowsButton = document.getElementById("add-sequence-of-rows");
+          addSequenceOfRowsButton.addEventListener("click", addSequenceOfRowsFromPreset);
+
+          function addSequenceOfRowsFromPreset() {
+            const presetSequenceInput = document.getElementById("preset-sequence");
+            const presetSequenceId = presetSequenceInput.value;
+
+            if (!presets[presetSequenceId]) {
+              console.log("Invalid preset ID");
+              return;
+            }
+
+            const rowElements = document.querySelectorAll(".row");
+
+            // Add new rows
+            presets[presetSequenceId].forEach((row) => {
+              const newRow = rowElements[0].cloneNode(true);
+              const inputs = newRow.querySelectorAll("input");
+
+              for (let i = 0; i < inputs.length; i++) {
+                const input = inputs[i];
+                const inputClass = input.getAttribute("class");
+                const inputValue = row[i];
+
+                if (input.type === "checkbox") {
+                  input.checked = inputValue;
+                } else if (inputClass === "color2") {
+                  input.value = inputValue.toString(16).padStart(6, "0");
+                } else {
+                  input.value = inputValue;
+                }
+              }
+
+              document.getElementById("rows").appendChild(newRow);
+            });
+          }
+
+
+          function addRowsFromSequence() {
+          const sequenceInput = document.getElementById("sequence");
+          const sequence = sequenceInput.value.split(",").map(Number);
+          const rows = document.querySelectorAll(".row");
+
+          sequence.forEach((index) => {
+              const row = rows[index];
+              const newRow = row.cloneNode(true);
+              document.getElementById("rows").appendChild(newRow);
+          });
+          }
+          
+
+          const c = document.getElementById("c");
+          const ctx = c.getContext("2d");
+          const db = document.getElementById("db");
+          const add = document.getElementById("add");
+          const preset = document.getElementById("preset");
+          const clear = document.getElementById("clear");
+
+          db.addEventListener("click", d);
+          add.addEventListener("click", addRow);
+          preset.addEventListener("change", applyPreset);
+          clear.addEventListener("click", clearCanvas);
+
+          function clearCanvas() {
+              ctx.clearRect(0, 0, c.width, c.height);
+          }
+
+          function addRow() {
+              const newRow = document.querySelector(".row").cloneNode(true);
+              document.getElementById("rows").appendChild(newRow);
+          }
+
+
+
+
+
+          function applyPreset() {
+              const presetValue = preset.value;
+              const presetData = presets[presetValue];
+              const rowElements = document.querySelectorAll(".row");
+
+              // Remove existing rows
+              rowElements.forEach((rowElement) => {
+                  rowElement.parentNode.removeChild(rowElement);
+              });
+
+              // Add new rows
+              presetData.forEach((row) => {
+                  const newRow = rowElements[0].cloneNode(true);
+                  const inputs = newRow.querySelectorAll("input");
+                  for (let i = 0; i < inputs.length; i++) {
+                  const input = inputs[i];
+                  const inputClass = input.getAttribute("class");
+                  const inputValue = row[i];
+                  if (input.type === "checkbox") {
+                      input.checked = inputValue;
+                  } else if (inputClass === "color2") {
+                      input.value = inputValue.toString(16).padStart(6, "0");
+                  } else {
+                      input.value = inputValue;
+                  }
+                  }
+                  document.getElementById("rows").appendChild(newRow);
+              });
+          }
+
+
+
+          async function d() {
+              const rows = document.querySelectorAll(".row");
+              let x = 250, y = 250, angle = 0;
+
+              for (const row of rows) {
+                  let dp = parseFloat(row.querySelector(".dp").value);
+                  const dpadd = parseFloat(row.querySelector(".dpadd").value);
+                  let m = parseFloat(row.querySelector(".m").value);
+                  let r = parseFloat(row.querySelector(".r").value);
+                  const a2m = parseFloat(row.querySelector(".a2m").value);
+                  const a2r = parseFloat(row.querySelector(".a2r").value);
+                  const rep = parseInt(row.querySelector(".rep").value);
+                  const ms = parseInt(row.querySelector(".ms").value);
+                  const color2 = row.querySelector(".color2").value;
+                  const colorHex = "#" + color2.toString(16).padStart(6, "0");
+
+
+
+
+                  if (row.querySelector(".useStartX").checked) {
+                      x = parseFloat(row.querySelector(".startX").value);
+                  }
+                  if (row.querySelector(".useStartY").checked) {
+                      y = parseFloat(row.querySelector(".startY").value);
+                  }
+                  if (row.querySelector(".useRot").checked) {
+                      angle = parseFloat(row.querySelector(".rot").value) * (Math.PI / 180);
+                  }
+
+                  for (let t = 0; t < rep; t++) {
+                      await new Promise(resolve => {
+                          setTimeout(() => {
+                              ctx.fillStyle = colorHex; 
+                              ctx.fillRect(x, y, dp, dp);
+                              x += Math.cos(angle) * m;
+                              y += Math.sin(angle) * m;
+                              angle += r * (Math.PI / 180);
+                              m += a2m;
+                              r += a2r;
+                              dp += dpadd;
+                              resolve();
+                          }, ms);
+                      });
+                  }
+              }
+          }
+          applyPreset()
+      </script>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+      ***Users Manual***
+      <br>
+      <br>
+      <br>
+      <br>
+      The array [2, 0, 1, 0, 0, 0, 108, 50, false, 250, false, 250, true, 0, 012345] 
+      <br>
+      represents the values for the input fields in a row of the drawing application. 
+      <br>
+      <br>
+      <br>
+      Each value corresponds to a specific input field in the row. Here's a description of each value:
+      <br>
+      <br>
+      2: DP (dot size) - The size of the dot to be drawn on the canvas.
+      <br>
+      0: DP Add (dot size addition) - The amount to change the dot size after each repetition.<br>
+      1: M (movement) - The distance to move the dot from its current position.<br>
+      0: R (rotation) - The rotation angle (in degrees) to apply to the movement direction after each repetition.<br>
+      0: A2M (addition to movement) - The amount to change the movement distance after each repetition.<br>
+      0: A2R (addition to rotation) - The amount to change the rotation angle after each repetition.<br>
+      108: Rep (repetitions) - The number of times to repeat the drawing operation.<br>
+      50: MS (milliseconds) - The delay between each drawing operation in milliseconds.<br>
+      false: Use StartX - A boolean value indicating whether to use a custom starting X position.<br>
+      250: X (starting X position) - The custom starting X position.<br>
+      false: Use StartY - A boolean value indicating whether to use a custom starting Y position.<br>
+      250: Y (starting Y position) - The custom starting Y position.<br>
+      true: Use Rot (use rotation) - A boolean value indicating whether to use a custom rotation angle.<br>
+      0: R (rotation) - The custom rotation angle (in degrees) to apply to the movement direction.<br>
+      012345: Color (color) - The color of the dot in hexadecimal format without the '#' sign (e.g., 012345 corresponds to #012345).<br>
+  </body>
+  </html>
