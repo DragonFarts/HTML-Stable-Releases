@@ -1,0 +1,27 @@
+
+
+***Users Manual***
+
+
+
+The array [2, 0, 1, 0, 0, 0, 108, 50, false, 250, false, 250, true, 0, 012345]
+represents the values for the input fields in a row of the drawing application.
+
+
+Each value corresponds to a specific input field in the row. Here's a description of each value:
+
+2: DP (dot size) - The size of the dot to be drawn on the canvas.
+0: DP Add (dot size addition) - The amount to change the dot size after each repetition.
+1: M (movement) - The distance to move the dot from its current position.
+0: R (rotation) - The rotation angle (in degrees) to apply to the movement direction after each repetition.
+0: A2M (addition to movement) - The amount to change the movement distance after each repetition.
+0: A2R (addition to rotation) - The amount to change the rotation angle after each repetition.
+108: Rep (repetitions) - The number of times to repeat the drawing operation.
+50: MS (milliseconds) - The delay between each drawing operation in milliseconds.
+false: Use StartX - A boolean value indicating whether to use a custom starting X position.
+250: X (starting X position) - The custom starting X position.
+false: Use StartY - A boolean value indicating whether to use a custom starting Y position.
+250: Y (starting Y position) - The custom starting Y position.
+true: Use Rot (use rotation) - A boolean value indicating whether to use a custom rotation angle.
+0: R (rotation) - The custom rotation angle (in degrees) to apply to the movement direction.
+012345: Color (color) - The color of the dot in hexadecimal format without the '#' sign (e.g., 012345 corresponds to #012345).
