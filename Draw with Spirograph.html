@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spirograph Drawing App</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Spirograph Drawing App</h1>
+    <br>
+    <canvas id="spiroCanvas" width="1920" height="1080"></canvas>
+    <br>
+    <label for="addPattern">Add Pattern to Canvas:</label>
+    <input type="checkbox" id="addPattern">
+    <button id="drawBtn">Draw with Teeth</button>
+    <button id="drawBtn2">Draw without Teeth</button>
+    <button id="clearBtn">Clear</button>
+    <br>
+    <br>    
+    <br>
+    <br>
+    <label for="startX">StartX:</label>
+    <input type="number" id="startX" value="960" min="1">
+    <label for="startY">StartY:</label>
+    <input type="number" id="startY" value="540" min="1">
+    <br>
+    <br>    
+    <br>
+    <label for="dir">Direction:</label>
+    <select id="dir">
+        <option value="1">Clockwise</option>
+        <option value="-1">Counterclockwise</option>
+    </select>
+    <label for="lC">Line Color:</label>
+    <input type="color" id="lC" value="#000000">
+    <label for="lW">Line Width:</label>
+    <input type="number" id="lW" value="1" min="1">
+    <label for="lS">Line Style:</label>
+    <select id="lS">
+        <option value="solid">Solid</option>
+        <option value="dashed">Dashed</option>
+        <option value="dotted">Dotted</option>
+    </select>
+    <br>
+    <label for="oR">Outer Radius (R):</label>
+    <input type="number" id="oR" value="100">
+    <label for="iRs">Inner Radii (r):</label>
+    <input type="text" id="iRs" value="60" placeholder="Enter comma-separated values">
+    <br>
+    <label for="pD">Pen Distance (d):</label>
+    <input type="number" id="pD" value="50">
+    <label for="sS">Step Size:</label>
+    <input type="number" id="sS" value="0.01" step="0.001" min="0.001">
+    <label for="nR">Number of Rotations:</label>
+    <input type="number" id="nR" value="10">
+    <br>
+    <br>
+    <br>
+    <label for="teethType">Teeth Type:</label>
+    <select id="teethType">
+        <option value="straight">Straight teeth</option>
+        <option value="helical">Helical teeth</option>
+        <option value="herringbone">Herringbone teeth</option>
+        <option value="cycloidal">Cycloidal teeth</option>
+        <option value="involute">Involute teeth</option>
+    </select>
+    <div id="teethTypeInputs">
+        <label for="helicalAngle">Helical Angle:</label>
+        <input type="number" id="helicalAngle" value="30" min="0" max="90">
+        <label for="cycloidFactor">Cycloid Factor:</label>
+        <input type="number" id="cycloidFactor" value="1" step="0.1" min="0">
+        <label for="addendum">Addendum:</label>
+        <input type="number" id="addendum" value="10" min="0">
+        <br>
+        <label for="dedendum">Dedendum:</label>
+        <input type="number" id="dedendum" value="10" min="0">
+        <label for="pressureAngle">Pressure Angle:</label>
+        <input type="number" id="pressureAngle" value="20" min="0" max="90">
+        <label for="faceWidth">Face Width:</label>
+        <input type="number" id="faceWidth" value="20" min="0">
+    </div>    
+    <label for="outerTeeth">Outer Gear Teeth:</label>
+    <input type="number" id="outerTeeth" value="60" min="1">
+    <label for="innerTeeth">Inner Gear Teeth:</label>
+    <input type="number" id="innerTeeth" value="30" min="1">
+    <br>
+    <br>
+
+
+    <script>
+        const c = document.getElementById('spiroCanvas');
+        const ct = c.getContext('2d');
+        const dB = document.getElementById('drawBtn');
+        const dB2 = document.getElementById('drawBtn2');
+        const cB = document.getElementById('clearBtn');
+        const oR = document.getElementById('oR');
+        const iRs = document.getElementById('iRs');
+        const pD = document.getElementById('pD');
+        const sS = document.getElementById('sS');
+        const nR = document.getElementById('nR');
+        const dir = document.getElementById('dir');
+        const lC = document.getElementById('lC');
+        const lW = document.getElementById('lW');
+        const lS = document.getElementById('lS');
+        const addP = document.getElementById('addPattern');
+        const outerTeeth = document.getElementById('outerTeeth');
+        const innerTeeth = document.getElementById('innerTeeth');
+        const teethType = document.getElementById('teethType');
+        const helicalAngle = document.getElementById('helicalAngle');
+        const cycloidFactor = document.getElementById('cycloidFactor');
+        const addendum = document.getElementById('addendum');
+        const dedendum = document.getElementById('dedendum');
+        const pressureAngle = document.getElementById('pressureAngle');
+        const faceWidth = document.getElementById('faceWidth');
+        const startX = document.getElementById('startX');
+        const startY = document.getElementById('startY');
+
+        dB.addEventListener('click', drawWithTeeth);
+        dB2.addEventListener('click', drawWithoutTeeth);
+        cB.addEventListener('click', clear);
+
+        function drawWithTeeth() {
+            if (!addP.checked) {
+                ct.clearRect(0, 0, c.width, c.height);
+            }
+
+            let R = parseInt(oR.value);
+            let d = parseInt(pD.value);
+            let step = parseFloat(sS.value);
+            let rotations = parseInt(nR.value);
+            let direction = parseInt(dir.value);
+            let centerX = parseInt(startX.value);
+            let centerY = parseInt(startY.value);
+            ct.beginPath();
+            ct.lineWidth = parseInt(lW.value);
+            ct.strokeStyle = lC.value;
+
+            // Set line style based on user input
+            switch (lS.value) {
+                case 'dashed':
+                    ct.setLineDash([5, 5]);
+                    break;
+                case 'dotted':
+                    ct.setLineDash([1, 3]);
+                    break;
+                default:
+                    ct.setLineDash([]);
+                    break;
+            }
+
+            // Parse the multiple inner radii
+            let innerRadii = iRs.value.split(',').map(x => parseInt(x.trim()));
+
+            // Get gear ratio from gear teeth inputs
+            let outerGearTeeth = parseInt(outerTeeth.value);
+            let innerGearTeeth = parseInt(innerTeeth.value);
+            let gearRatio = innerGearTeeth / outerGearTeeth;
+
+            // Loop through each inner radius
+            for (let r of innerRadii) {
+                for (let t = 0; t < rotations * 2 * Math.PI; t += step) {
+                    let rand = Math.random() * 0.2 - 0.1; // Add random value between -0.1 and 0.1
+                    let x, y;
+
+                    switch (teethType.value) {
+                        case 'straight':
+                            x = (R - r) * Math.cos(t + rand) + d * Math.cos((R - r) * t / r * direction);
+                            y = (R - r) * Math.sin(t + rand) - d * Math.sin((R - r) * t / r * direction);
+                            break;
+                        case 'helical':
+                            let angle = parseFloat(helicalAngle.value) * Math.PI / 180;
+                            x = (R - r) * Math.cos(t + rand) + d * Math.cos((R - r) * t / r * direction + angle * t);
+                            y = (R - r) * Math.sin(t + rand) - d * Math.sin((R - r) * t / r * direction + angle * t);
+                            break;
+                        case 'herringbone':
+                            let angle2 = parseFloat(helicalAngle.value) * Math.PI / 180;
+                            let sign = Math.sin((R - r) * t / r * direction + angle2 * t) >= 0 ? 1 : -1;
+                            x = (R - r) * Math.cos(t + rand) + sign * d * Math.cos((R - r) * t / r * direction + angle2 * t);
+                            y = (R - r) * Math.sin(t + rand) - sign * d * Math.sin((R - r) * t / r * direction + angle2 * t);
+                            break;
+                        case 'cycloid':
+                            let factor = parseFloat(cycloidFactor.value);
+                            let radius = (R - r) * factor;
+                            let theta = (R - r) * t / r * direction / radius + rand;
+                            x = radius * (Math.sin(theta) - theta * Math.cos(theta)) + d * Math.cos((R - r) * t / r * direction);
+                            y = radius * (Math.cos(theta) + theta * Math.sin(theta)) - d * Math.sin((R - r) * t / r * direction);
+                            break;
+                        case 'involute':
+                        let add = parseFloat(addendum.value);
+                            let ded = parseFloat(dedendum.value);
+                            let angle3 = parseFloat(pressureAngle.value) * Math.PI / 180;
+                            let baseRadius = (R - r) * Math.cos(angle3);
+                            let pitchRadius = (R - r) / Math.cos(angle3);
+                            let theta2 = (R - r) * t / r * direction / pitchRadius + rand;
+                            let phi = Math.atan2(Math.tan(theta2), 1) - theta2;
+                            let x1 = (baseRadius + add) * Math.cos(theta2) + d * Math.cos((R - r) * t / r * direction);
+                            let y1 = (baseRadius + add) * Math.sin(theta2) - d * Math.sin((R - r) * t / r * direction);
+                            let x2 = (baseRadius - ded) * Math.cos(theta2 + phi) + d * Math.cos((R - r) * t / r * direction);
+                            let y2 = (baseRadius - ded) * Math.sin(theta2 + phi) - d * Math.sin((R - r) * t / r * direction);
+                            ct.moveTo(centerX + x1, centerY + y1);
+                            ct.lineTo(centerX + x2, centerY + y2);
+                            break;
+                        default:
+                            x = (R - r) * Math.cos(t + rand) + d * Math.cos((R - r) * t / r * direction);
+                            y = (R - r) * Math.sin(t + rand) - d * Math.sin((R - r) * t / r * direction);
+                            break;
+                    }
+
+                    ct.lineTo(centerX + x, centerY + y);
+                }
+            }
+
+            ct.stroke();
+        }
+
+        function drawWithoutTeeth() {
+            if (!addP.checked) {
+                ct.clearRect(0, 0, c.width, c.height);
+            }
+
+            let R = parseInt(oR.value);
+            let d = parseInt(pD.value);
+            let step = parseFloat(sS.value);
+            let rotations = parseInt(nR.value);
+            let direction = parseInt(dir.value);
+            let centerX = parseInt(startX.value);
+            let centerY = parseInt(startY.value);
+            ct.beginPath();
+            ct.lineWidth = parseInt(lW.value);
+            ct.strokeStyle = lC.value;
+
+            // Set line style based on user input
+            switch (lS.value) {
+                case 'dashed':
+                    ct.setLineDash([5, 5]);
+                    break;
+                case 'dotted':
+                    ct.setLineDash([1, 3]);
+                    break;
+                default:
+                    ct.setLineDash([]);
+                    break;
+            }
+
+            // Parse the multiple inner radii
+            let innerRadii = iRs.value.split(',').map(x => parseInt(x.trim()));
+
+            // Loop through each inner radius
+            for (let r of innerRadii) {
+                for (let t = 0; t < rotations * 2 * Math.PI; t += step) {
+                    let x = (R - r) * Math.cos(t) + d * Math.cos((R - r) * t / r * direction);
+                    let y = (R - r) * Math.sin(t) - d * Math.sin((R - r) * t / r * direction);
+                    ct.lineTo(centerX + x, centerY + y);
+                }
+            }
+
+            ct.stroke();
+        }
+
+        function clear() {
+            ct.clearRect(0, 0, c.width, c.height);
+        }
+    </script>
+</body>
+</html>
