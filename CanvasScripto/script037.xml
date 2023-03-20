@@ -1,0 +1,13 @@
+<variables>
+  <variable name="sw" value="1"/>
+  <variable name="waves" value="[]"/>
+  <variable name="freq" value="0"/>
+  <variable name="amp" value="0"/>
+  <variable name="t" value="0"/>
+  <variable name="minFreq" value="-4"/>
+  <variable name="maxFreq" value="4"/>
+  <variable name="minAmp" value="-21"/>
+  <variable name="maxAmp" value="21"/>
+  <variable name="lineScrollSpeed" value="1.44"/>
+  <variable name="lineThickeningSpeed" value="0"/>
+</variables>

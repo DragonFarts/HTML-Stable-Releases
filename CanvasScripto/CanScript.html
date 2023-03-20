@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Canvas Example</title>
+	<style>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+</head>
+<body onload="init()">
+	<canvas id="myCanvas" width="500" height="500"></canvas>
+	<br>
+	<label for="scriptTypeSelect">Script Type:</label>
+<select id="scriptTypeSelect" onchange="generateScriptOptions()">
+    <option value="Script">Script</option>
+    <option value="Test">Test</option>
+    <option value="Trash">Trash</option>
+</select>
+
+	<label for="scriptSelect">Select Script:</label>
+	<select id="scriptSelect" onchange="loadScript()">
+	</select>
+	
+	<button onclick="clearCanvas()">Clear Canvas</button>
+	<button onclick="startDrawing()">Play</button>
+	<button onclick="stopDrawing()">Stop</button>
+	<button onclick="startRecording()">Record</button>
+	<button onclick="stopRecording()">Stop Recording</button>
+	<br>
+	<br>
+	<button onclick="save()">Save as Zip</button>
+	<br>
+	<br>
+	<button onclick="clearCanvas()">Clear Canvas</button>
+	<button onclick="clearArray()">Clear Array</button>
+	<br>
+	<br>
+	<label for="canvasWidth">Canvas Width:</label>
+	<input type="number" id="canvasWidth" min="1" max="10000" value="500">
+	<label for="canvasHeight">Canvas Height:</label>
+	<input type="number" id="canvasHeight" min="1" max="10000" value="500">
+	<button onclick="updateCanvas()">Update Canvas</button>
+	<br>
+	<br>
+	<label for="fpsInput">Images per second:</label>
+	<input type="number" id="fpsInput" min="1" max="10000" value="30">
+	<p>Number of images in array: <span id="numImages"></span></p>
+	<script src="script001.js" id="script"></script>
+	<script>
+		var imgArray = [];
+		var intervalId;
+
+		const numberOfScripts = 33;
+
+		function generateScriptOptions() {
+			const scriptSelect = document.getElementById("scriptSelect");
+			const scriptTypeSelect = document.getElementById("scriptTypeSelect");
+			const scriptType = scriptTypeSelect.value;
+
+
+
+			for (let i = 0; i < numberOfScripts; i++) {
+				const scriptNumber = String(i).padStart(3, "0");
+				const scriptFilename = `${scriptType}${scriptNumber}.js`;
+
+				const option = document.createElement("option");
+				option.value = scriptFilename;
+				option.textContent = scriptFilename;
+				scriptSelect.appendChild(option);
+			}
+		}
+
+		generateScriptOptions();
+
+
+		function clearCanvas() {
+			var canvas = document.getElementById("myCanvas");
+			var context = canvas.getContext("2d");
+			context.clearRect(0, 0, canvas.width, canvas.height);
+		}
+
+		function updateCanvas() {
+			var canvas = document.getElementById("myCanvas");
+			var canvasWidth = document.getElementById("canvasWidth").value;
+			var canvasHeight = document.getElementById("canvasHeight").value;
+			canvas.width = canvasWidth;
+			canvas.height = canvasHeight;
+			clearCanvas();
+		}
+
+		function loadScript() {
+			var select = document.getElementById("scriptSelect");
+			var script = document.getElementById("script");
+			script.parentNode.removeChild(script);
+			script = document.createElement("script");
+			script.src = select.value;
+			script.id = "script";
+			document.head.appendChild(script);
+		}
+
+		function clearCanvas() {
+			var canvas = document.getElementById("myCanvas");
+			var context = canvas.getContext("2d");
+			context.clearRect(0, 0, canvas.width, canvas.height);
+		}
+
+		function clearArray() {
+			imgArray = [];
+			updateNumImages();
+		}
+
+		function startRecording() {
+			var canvas = document.getElementById("myCanvas");
+			var fps = parseInt(document.getElementById("fpsInput").value);
+			var intervalTime = 1000 / fps;
+			intervalId = setInterval(function() {
+				var imgData = canvas.toDataURL();
+				imgArray.push(imgData);
+				updateNumImages();
+			}, intervalTime);
+		}
+
+		function stopRecording() {
+			clearInterval(intervalId);
+		}
+
+		function save() {
+			stopRecording();
+			var zip = new JSZip();
+			for (var i = 0; i < imgArray.length; i++) {
+				var filename = "seq" + pad(i+1, 6) + ".png";
+				zip.file(filename, imgArray[i].split(',')[1], {base64: true});
+			}
+			zip.generateAsync({type:"blob"})
+			.then(function(content) {
+				saveAs(content, "canvas_images.zip");
+			});
+			imgArray = [];
+			updateNumImages();
+		}
+
+		function pad(num, size) {
+			var s = num.toString();
+			while (s.length < size) {
+				s = "0" + s;
+			}
+			return s;
+		}
+
+		function updateNumImages() {
+			document.getElementById("numImages").textContent = imgArray.length;
+		}
+	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
+</body>
+</html>
