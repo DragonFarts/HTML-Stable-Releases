@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Room Walkthrough</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+	<style>
+		body {
+			margin: 0;
+			overflow: hidden;
+		}
+		canvas {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<script>
+		// Create the scene, camera, and renderer
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+        
+
+		// Generate the wall texture
+		const canvas = document.createElement('canvas');
+		canvas.width = 108;
+		canvas.height = 108;
+		const ctx = canvas.getContext('2d');
+		ctx.fillStyle = '#8B4513';
+		ctx.fillRect(0, 0, 256, 256);
+		ctx.fillStyle = '#A0522D';
+		for (let i = 0; i < 32; i++) {
+			for (let j = 0; j < 32; j++) {
+				if ((i + j) % 2 == 0) {
+					ctx.fillRect(i * 8, j * 8, 16, 16);
+					ctx.fillStyle = '#8B4513';
+					ctx.fillRect(i * 8 + 4, j * 8 + 1, 8, 8);
+					ctx.fillStyle = '#000000';
+					ctx.fillRect(i * 8, j * 8, 16, 1);
+					ctx.fillRect(i * 8, j * 8, 1, 16);
+					ctx.fillRect(i * 8, j * 8 + 12, 16, 1);
+					ctx.fillRect(i * 8 + 12, j * 8, 1, 16);
+					ctx.fillStyle = '#A0522D';
+				}
+			}
+		}
+		const wallTexture = new THREE.CanvasTexture(canvas);
+		wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+		wallTexture.repeat.set(4, 4);
+
+
+        // Generate the pillar texture
+		const pillarCanvas = document.createElement('canvas');
+		pillarCanvas.width = 256;
+		pillarCanvas.height = 256;
+		const pillarCtx = pillarCanvas.getContext('2d');
+		pillarCtx.fillStyle = '#fff0f0';
+		pillarCtx.fillRect(0, 0, 256, 256);
+		for (let i = 0; i < 256 * 256 / 2; i++) {
+			const x = Math.floor(Math.random() * 256);
+			const y = Math.floor(Math.random() * 256);
+			pillarCtx.fillStyle = '#3f3330';
+			pillarCtx.fillRect(x, y, 5, 1);
+		}
+		const pillarTexture = new THREE.CanvasTexture(pillarCanvas);
+		pillarTexture.wrapS = pillarTexture.wrapT = THREE.RepeatWrapping;
+		pillarTexture.repeat.set(1, 1);
+
+		// Generate the roof texture
+		const roofCanvas = document.createElement('canvas');
+		roofCanvas.width = 256;
+		roofCanvas.height = 256;
+		const roofCtx = roofCanvas.getContext('2d');
+		roofCtx.fillStyle = '#444444';
+		roofCtx.fillRect(0, 0, 256, 256);
+		for (let i = 0; i < 256 * 256 / 3; i++) {
+			const x = Math.floor(Math.random() * 256);
+			const y = Math.floor(Math.random() * 256);
+			roofCtx.fillStyle = '#000000';
+			roofCtx.fillRect(x, y, 1, 1);
+		}
+		const roofTexture = new THREE.CanvasTexture(roofCanvas);
+		roofTexture.wrapS = roofTexture.wrapT = THREE.RepeatWrapping;
+		roofTexture.repeat.set(4, 4);
+
+		// Generate the floor texture
+		const floorCanvas = document.createElement('canvas');
+		floorCanvas.width = 256;
+		floorCanvas.height = 256;
+		const floorCtx = floorCanvas.getContext('2d');
+		floorCtx.fillStyle = '#000000';
+            floorCtx.fillRect(0, 0, 256, 256);
+        for (let i = 0; i < 256 * 256 / 3; i++) {
+            const x = Math.floor(Math.random() * 256);
+            const y = Math.floor(Math.random() * 256);
+            floorCtx.fillStyle = '#223344';
+            floorCtx.fillRect(x, y, 1, 1);
+            }
+            const floorTexture = new THREE.CanvasTexture(floorCanvas);
+            floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+            floorTexture.repeat.set(4, 4);
+
+            // Add the cubes to the scene
+            const frontbackwalls = new THREE.BoxGeometry(500, 100, 0.2);
+            const sidewalls = new THREE.BoxGeometry(0.2, 100, 500);
+            const roofsfloors = new THREE.BoxGeometry(250, 0.2, 250);
+            const pillard = new THREE.BoxGeometry(10, 40, 10);
+
+            const brownMaterial = new THREE.MeshBasicMaterial({ map: wallTexture });
+            const grayMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
+            const roof = new THREE.Mesh(roofsfloors, new THREE.MeshBasicMaterial({ map: roofTexture }));
+            roof.position.set(0, 27, 0);
+            scene.add(roof);
+            const floor = new THREE.Mesh(roofsfloors, new THREE.MeshBasicMaterial({ map: floorTexture }));
+            floor.position.set(0, -3.5, 0);
+            scene.add(floor);
+            const wall1 = new THREE.Mesh(sidewalls, brownMaterial);
+            wall1.position.set(-100, -2, 0);
+            scene.add(wall1);
+            const wall2 = new THREE.Mesh(sidewalls, brownMaterial);
+            wall2.position.set(100, -2, 0);
+            scene.add(wall2);
+            const wall3 = new THREE.Mesh(frontbackwalls, brownMaterial);
+            wall3.position.set(0, -2, -100);
+            scene.add(wall3);
+            const wall4 = new THREE.Mesh(frontbackwalls, brownMaterial);
+            wall4.position.set(0, -2, 100);
+            scene.add(wall4);
+            const pillar = new THREE.Mesh(pillard, new THREE.MeshBasicMaterial({ map: pillarTexture }));
+            pillar.position.set(-50, 0, 50);
+            scene.add(pillar);
+            const pillar2 = new THREE.Mesh(pillard, new THREE.MeshBasicMaterial({ map: pillarTexture }));
+            pillar2.position.set(50, 0, 50);
+            scene.add(pillar2);
+            const pillar3 = new THREE.Mesh(pillard, new THREE.MeshBasicMaterial({ map: pillarTexture }));
+            pillar3.position.set(-50, 0, -50);
+            scene.add(pillar3);
+            const pillar4 = new THREE.Mesh(pillard, new THREE.MeshBasicMaterial({ map: pillarTexture }));
+            pillar4.position.set(50, 0, -50);
+            scene.add(pillar4);
+            ;
+
+            // Set the camera's starting position and rotation
+            camera.position.set(0, 0, 0);
+
+
+            // Add event listeners for WSAD movement
+            const movement = {
+                forward: false,
+                backward: false,
+                left: false,
+                right: false,
+                sideleft: false,
+                sideright: false,
+                ascend: false,
+                descend: false,
+                tright: false,
+                tleft: false
+            };
+
+            document.addEventListener('keydown', (event) => {
+                switch (event.code) {
+                    
+
+                    case 'KeyW':
+                        movement.forward = true;
+                        break;
+                    case 'KeyS':
+                        movement.backward = true;
+                        break;
+                    case 'KeyA':
+                        movement.left = true;
+                        break;
+                    case 'KeyD':
+                        movement.right = true;
+                        break;
+                    case 'KeyI':
+                        movement.up = true;
+                        break;
+                    case 'KeyK':
+                        movement.down = true;
+                        break;
+                    case 'KeyQ':
+                        movement.sideleft = true;
+                        break;
+                    case 'KeyE':
+                        movement.sideright = true;
+                        break;
+                    case 'KeyR':
+                        movement.ascend = true;
+                        break;
+                    case 'KeyF':
+                        movement.descend = true;
+                        break;
+                    case 'KeyJ':
+                        movement.tleft = true;
+                        break;
+                    case 'KeyL':
+                        movement.tright = true;
+                        break;
+                }
+            });
+
+            document.addEventListener('keyup', (event) => {
+                switch (event.code) {
+                    case 'KeyW':
+                        movement.forward = false;
+                        break;
+                    case 'KeyS':
+                        movement.backward = false;
+                        break;
+                    case 'KeyA':
+                        movement.left = false;
+                        break;
+                    case 'KeyD':
+                        movement.right = false;
+                        break;
+                    case 'KeyI':
+                        movement.up = false;
+                        break;
+                    case 'KeyK':
+                        movement.down = false;
+                        break;
+                    case 'KeyQ':
+                        movement.sideleft = false;
+                        break;
+                    case 'KeyE':
+                        movement.sideright = false;
+                        break;
+                    case 'KeyR':
+                        movement.ascend = false;
+                        break;
+                    case 'KeyF':
+                        movement.descend = false;
+                        break;
+                    case 'KeyJ':
+                        movement.tleft = false;
+                        break;
+                    case 'KeyL':
+                        movement.tright = false;
+                        break;
+                }
+            });
+
+
+
+
+
+            // Update the camera's position based on WSAD movement
+            function update() {    
+
+                if (movement.forward) {
+                    const axis = new THREE.Vector3(0, 0, -1); // define the movement axis
+                    const angle = -camera.rotation.y; // get the angle of movement relative to the camera's self orientation
+                    const direction = axis.applyQuaternion(camera.quaternion); // convert the axis to world space
+                    camera.position.add(direction.multiplyScalar(0.1)); // move the camera in the direction of the axis
+                }
+                if (movement.backward) {
+                    const axis = new THREE.Vector3(0, 0, 1); // define the movement axis
+                    const angle = -camera.rotation.y + Math.PI; // get the angle of movement relative to the camera's self orientation
+                    const direction = axis.applyQuaternion(camera.quaternion); // convert the axis to world space
+                    camera.position.add(direction.multiplyScalar(0.1)); // move the camera in the direction of the axis
+                }
+                if (movement.ascend) {
+                    camera.position.y += 0.1;
+                }
+                if (movement.descend) {
+                    camera.position.y -= 0.1;
+                }
+
+
+                if (movement.sideleft) {
+                    const axis = new THREE.Vector3(-1, 0, 0); // define the movement axis
+                    const angle = -camera.rotation.y - Math.PI / 2; // get the angle of movement relative to the camera's self orientation
+                    const direction = axis.applyQuaternion(camera.quaternion); // convert the axis to world space
+                    camera.position.add(direction.multiplyScalar(0.1)); // move the camera in the direction of the axis
+                }
+                if (movement.sideright) {
+                    const axis = new THREE.Vector3(1, 0, 0); // define the movement axis
+                    const angle = -camera.rotation.y + Math.PI / 2; // get the angle of movement relative to the camera's self orientation
+                    const direction = axis.applyQuaternion(camera.quaternion); // convert the axis to world space
+                    camera.position.add(direction.multiplyScalar(0.1)); // move the camera in the direction of the axis
+                }
+
+                if (movement.right) {
+                    const axis = new THREE.Vector3(0, 1, 0);
+                    const angle = -0.01;
+                    const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+                    camera.quaternion.multiply(quaternion); // rotate right globally
+                }
+                if (movement.left) {
+                    const axis = new THREE.Vector3(0, 1, 0);
+                    const angle = 0.01;
+                    const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, angle);
+                    camera.quaternion.multiply(quaternion); // rotate left globally
+                }
+
+
+
+                if (movement.tright) {
+                    const axis = new THREE.Vector3(0, 0, 1); // define the rotation axis
+                    const angle = -0.01; // define the rotation angle (negative for right)
+                    const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, angle); // create the quaternion
+                    camera.quaternion.multiply(quaternion); // apply the rotation to the camera
+                    camera.translateX(0.1); // move the camera to the right (positive x)
+                }
+                if (movement.tleft) {
+                    const axis = new THREE.Vector3(0, 0, 1); // define the rotation axis
+                    const angle = 0.01; // define the rotation angle (positive for left)
+                    const quaternion = new THREE.Quaternion().setFromAxisAngle(axis, angle); // create the quaternion
+                    camera.quaternion.multiply(quaternion); // apply the rotation to the camera
+                    camera.translateX(-0.1); // move the camera to the left (negative x)
+                }
+
+
+
+
+                if (movement.up) {
+                    const xAxis = new THREE.Vector3(1, 0, 0);
+                    const angle = -0.01;
+                    const quaternion = new THREE.Quaternion().setFromAxisAngle(xAxis, angle);
+                    camera.quaternion.multiply(quaternion); // rotate up globally
+                }
+                if (movement.down) {
+                    const xAxis = new THREE.Vector3(1, 0, 0);
+                    const angle = 0.01;
+                    const quaternion = new THREE.Quaternion().setFromAxisAngle(xAxis, angle);
+                    camera.quaternion.multiply(quaternion); // rotate down globally
+                }
+
+                
+
+            }
+
+                // Render the scene and update the camera position every frame
+            function animate() {
+                requestAnimationFrame(animate);
+                update();
+                renderer.render(scene, camera);
+                
+            }
+
+            animate();
+    </script>
+</body>
+</html>

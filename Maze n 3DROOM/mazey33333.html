@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>3D Maze with Hallways, Rooms, and Dead Ends</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+  const w = 500, h = 500;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(w, h);
+  document.body.appendChild(renderer.domElement);
+
+  const createBrickTexture = () => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const brickWidth = 32, brickHeight = 16;
+    canvas.width = brickWidth;
+    canvas.height = brickHeight;
+
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, brickWidth, brickHeight);
+    ctx.fillStyle = 'brown';
+    ctx.fillRect(1, 1, brickWidth - 2, brickHeight - 2);
+
+    const imageData = ctx.getImageData(0, 0, brickWidth, brickHeight);
+    const texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  };
+
+  const brickTexture = createBrickTexture();
+  const g = new THREE.BoxGeometry(1, 2.16, 1);
+  const m = new THREE.MeshBasicMaterial({ map: brickTexture });
+
+  const gridSize = 21;
+  const spacing = 1;
+
+  function createMaze() {
+    const maze = Array.from({ length: gridSize }, () => Array(gridSize).fill(false));
+
+    const stack = [[1, 1]];
+    maze[1][1] = true;
+
+    const directions = [[-2, 0], [2, 0], [0, -2], [0, 2]];
+
+    while (stack.length) {
+      const [x, y] = stack[stack.length - 1];
+      const neighbors = directions
+        .map(([dx, dy]) => [x + dx, y + dy])
+        .filter(([nx, ny]) =>
+          nx > 0 && ny > 0 && nx < gridSize - 1 && ny < gridSize - 1 && !maze[ny][nx]
+        );
+
+      if (neighbors.length) {
+        const [nx, ny] = neighbors[Math.floor(Math.random() * neighbors.length)];
+        maze[ny][nx] = true;
+        maze[y + (ny - y) / 2][x + (nx - x) / 2] = true;
+        stack.push([nx, ny]);
+      } else {
+        stack.pop();
+      }
+    }
+
+    return maze;
+  }
+
+  const maze = createMaze();
+
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      if (!maze[j][i]) {
+        const c = new THREE.Mesh(g, m);
+        c.position.set(i * spacing, 0, j * spacing);
+        scene.add(c);
+      }
+    }
+  }
+
+ 
+  camera.position.set(1 * spacing, 0.5, 1 * spacing);
+  camera.lookAt(new THREE.Vector3(3 * spacing, 0.5, 1 * spacing));
+
+  // Movement script integration starts here
+  const movement = {
+    forward: false, backward: false, left: false, right: false,
+    sideleft: false, sideright: false, ascend: false, descend: false,
+    tright: false, tleft: false
+  };
+
+  document.addEventListener('keydown', (event) => {
+    switch (event.code) {
+      case 'KeyW': movement.forward = true; break;
+      case 'KeyS': movement.backward = true; break;
+      case 'KeyA': movement.left = true; break;
+      case 'KeyD': movement.right = true; break;
+      case 'KeyI': movement.up = true; break;
+      case 'KeyK': movement.down = true; break;
+      case 'KeyQ': movement.sideleft = true; break;
+      case 'KeyE': movement.sideright = true; break;
+      case 'KeyR': movement.ascend = true; break;
+      case 'KeyF': movement.descend = true; break;
+      case 'KeyJ': movement.tleft = true; break;
+      case 'KeyL': movement.tright = true; break;
+    }
+  });
+
+  document.addEventListener('keyup', (event) => {
+    switch (event.code) {
+      case 'KeyW': movement.forward = false; break;
+      case 'KeyS': movement.backward = false; break;
+      case 'KeyA': movement.left = false; break;
+      case 'KeyD': movement.right = false; break;
+      case 'KeyI': movement.up = false; break;
+      case 'KeyK': movement.down = false; break;
+      case 'KeyQ': movement.sideleft = false; break;
+      case 'KeyE': movement.sideright = false; break;
+      case 'KeyR': movement.ascend = false; break;
+      case 'KeyF': movement.descend = false; break;
+      case 'KeyJ': movement.tleft = false; break;
+      case 'KeyL': movement.tright = false; break;
+    }
+  });
+
+  function update() {
+    const speed = 0.01;
+
+    if (movement.forward) {
+      camera.translateZ(-speed);
+    }
+    if (movement.backward) {
+      camera.translateZ(speed);
+    }
+    if (movement.ascend) {
+      camera.translateY(speed);
+    }
+    if (movement.descend) {
+      camera.translateY(-speed);
+    }
+    if (movement.sideleft) {
+      camera.translateX(-speed);
+    }
+    if (movement.sideright) {
+      camera.translateX(speed);
+    }
+    if (movement.right) {
+      camera.rotateY(-0.01);
+    }
+    if (movement.left) {
+      camera.rotateY(0.01);
+    }
+    if (movement.tright) {
+      camera.rotateZ(-0.01);
+    }
+    if (movement.tleft) {
+      camera.rotateZ(0.01);
+    }
+    if (movement.up) {
+      camera.rotateX(-0.01);
+    }
+    if (movement.down) {
+      camera.rotateX(0.01);
+    }
+  }
+  // Movement script integration ends here
+
+
+  const animate = () => {
+    requestAnimationFrame(animate);
+    update();
+    renderer.render(scene, camera);
+  };
+
+  animate();
+  </script>
+</body>
+</html>
