@@ -1,160 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title>Canvas Example</title>
-	<style>
-		canvas {
-			border: 1px solid black;
-		}
-	</style>
-
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VHS Lite</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
 </head>
-<body onload="init()">
-	<canvas id="myCanvas" width="500" height="500"></canvas>
-	<br>
-	<label for="scriptTypeSelect">Script Type:</label>
-<select id="scriptTypeSelect" onchange="generateScriptOptions()">
-    <option value="Script">Script</option>
-    <option value="Test">Test</option>
-    <option value="Trash">Trash</option>
-</select>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <br>
+    <select id="scriptSelect">
+        <option value="000">000</option>
+        <option value="001">001</option>
+        <option value="002">002</option>
+        <option value="003">003</option>
+        <option value="004">004</option>
+        <option value="005">005</option>
+        <option value="006">006</option>
+        <option value="007">007</option>
+        <option value="008">008</option>
+        <option value="009">009</option>
+        <option value="010">010</option>
+        <option value="011">011</option>
+        <option value="012">012</option>
+        <option value="013">013</option>
+        <option value="014">014</option>
+        <option value="015">015</option>
+        <option value="016">016</option>
+        <option value="017">017</option>
+        <option value="018">018</option>
+        <option value="019">019</option>
+        <option value="020">020</option>
+        <option value="021">021</option>
+        <option value="022">022</option>
+        <option value="023">023</option>
+        <option value="024">024</option>
+        <option value="025">025</option>
+        <option value="026">026</option>
+        <option value="027">027</option>
+        <option value="028">028</option>
+        <option value="029">029</option>
+        <option value="030">030</option>
+        <option value="031">031</option>
+        <option value="032">032</option>
+        <option value="033">033</option>
+        <option value="034">034</option>
+        <option value="035">035</option>
+        <option value="036">036</option>
+        <option value="037">037</option>
+        <option value="038">038</option>
+        
+    </select>
+    <button id="loadScript">Load Script</button>
+    <button id="playButton" disabled>Play</button>
+    <button id="stopButton" disabled>Stop</button>
+    <button id="clearCanvas" disabled>Clear Canvas</button>
 
-	<label for="scriptSelect">Select Script:</label>
-	<select id="scriptSelect" onchange="loadScript()">
-	</select>
-	<button onclick="loadScript()">Load Script</button> <!-- Add this line to create a Load Script button -->
-	
-	<button onclick="clearCanvas()">Clear Canvas</button>
-	<button onclick="startDrawing()">Play</button>
-	<button onclick="stopDrawing()">Stop</button>
-	<button onclick="startRecording()">Record</button>
-	<button onclick="stopRecording()">Stop Recording</button>
-	<br>
-	<br>
-	<button onclick="save()">Save as Zip</button>
-	<br>
-	<br>
-	<button onclick="clearCanvas()">Clear Canvas</button>
-	<button onclick="clearArray()">Clear Array</button>
-	<br>
-	<br>
-	<label for="canvasWidth">Canvas Width:</label>
-	<input type="number" id="canvasWidth" min="1" max="10000" value="500">
-	<label for="canvasHeight">Canvas Height:</label>
-	<input type="number" id="canvasHeight" min="1" max="10000" value="500">
-	<button onclick="updateCanvas()">Update Canvas</button>
-	<br>
-	<br>
-	<label for="fpsInput">Images per second:</label>
-	<input type="number" id="fpsInput" min="1" max="10000" value="30">
-	<p>Number of images in array: <span id="numImages"></span></p>
-<script src="script001.js" id="script"></script><script src="script002.js" id="script"></script><script src="script003.js" id="script"></script><script src="script004.js" id="script"></script><script src="script005.js" id="script"></script><script src="script006.js" id="script"></script><script src="script007.js" id="script"></script><script src="script008.js" id="script"></script><script src="script009.js" id="script"></script><script src="script010.js" id="script"></script><script src="script011.js" id="script"></script><script src="script012.js" id="script"></script><script src="script013.js" id="script"></script><script src="script014.js" id="script"></script><script src="script015.js" id="script"></script><script src="script016.js" id="script"></script><script src="script017.js" id="script"></script><script src="script018.js" id="script"></script><script src="script019.js" id="script"></script><script src="script020.js" id="script"></script><script src="script021.js" id="script"></script><script src="script022.js" id="script"></script><script src="script023.js" id="script"></script><script src="script024.js" id="script"></script><script src="script025.js" id="script"></script><script src="script026.js" id="script"></script><script src="script027.js" id="script"></script><script src="script028.js" id="script"></script><script src="script029.js" id="script"></script><script src="script030.js" id="script"></script><script src="script031.js" id="script"></script><script src="script032.js" id="script"></script><script src="script033.js" id="script"></script><script src="script034.js" id="script"></script><script src="script035.js" id="script"></script><script src="script036.js" id="script"></script><script src="script037.js" id="script"></script><script src="script038.js" id="script"></script>
-	<script>
-		var imgArray = [];
-		var intervalId;
+    <script>
+        document.getElementById("loadScript").addEventListener("click", function() {
+            var scriptSelect = document.getElementById("scriptSelect");
+            var scriptNumber = scriptSelect.options[scriptSelect.selectedIndex].value;
+            var script = document.createElement("script");
+            script.src = "script" + scriptNumber.padStart(3, '0') + ".js";
+            document.body.appendChild(script);
 
-		const numberOfScripts = 39;
+            script.onload = function() {
+                init();
 
-function generateScriptOptions() {
-    const scriptSelect = document.getElementById("scriptSelect");
-    const scriptTypeSelect = document.getElementById("scriptTypeSelect");
-    const scriptType = scriptTypeSelect.value;
-    
-    scriptSelect.innerHTML = ""; // clear existing options
-    
-    for (let i = 0; i < numberOfScripts; i++) {
-        const scriptNumber = String(i).padStart(3, "0");
-        const scriptFilename = `${scriptType}${scriptNumber}.js`;
+                document.getElementById("playButton").addEventListener("click", startDrawing);
+                document.getElementById("stopButton").addEventListener("click", stopDrawing);
+                document.getElementById("clearCanvas").addEventListener("click", function() {
+                    stopDrawing();
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                });
 
-        const option = document.createElement("option");
-        option.value = scriptFilename;
-        option.textContent = scriptFilename;
-        scriptSelect.appendChild(option);
-    }
-}
-
-		generateScriptOptions();
-
-
-		function clearCanvas() {
-			var canvas = document.getElementById("myCanvas");
-			var context = canvas.getContext("2d");
-			context.clearRect(0, 0, canvas.width, canvas.height);
-		}
-
-		function updateCanvas() {
-			var canvas = document.getElementById("myCanvas");
-			var canvasWidth = document.getElementById("canvasWidth").value;
-			var canvasHeight = document.getElementById("canvasHeight").value;
-			canvas.width = canvasWidth;
-			canvas.height = canvasHeight;
-			clearCanvas();
-		}
-
-		function loadScript() {
-			var select = document.getElementById("scriptSelect");
-			var script = document.getElementById("script");
-			script.parentNode.removeChild(script);
-			script = document.createElement("script");
-			script.src = select.value;
-			script.id = "script";
-			document.head.appendChild(script);
-		}
-
-		function clearCanvas() {
-			var canvas = document.getElementById("myCanvas");
-			var context = canvas.getContext("2d");
-			context.clearRect(0, 0, canvas.width, canvas.height);
-		}
-
-		function clearArray() {
-			imgArray = [];
-			updateNumImages();
-		}
-
-		function startRecording() {
-			var canvas = document.getElementById("myCanvas");
-			var fps = parseInt(document.getElementById("fpsInput").value);
-			var intervalTime = 1000 / fps;
-			intervalId = setInterval(function() {
-				var imgData = canvas.toDataURL();
-				imgArray.push(imgData);
-				updateNumImages();
-			}, intervalTime);
-		}
-
-		function stopRecording() {
-			clearInterval(intervalId);
-		}
-
-		function save() {
-			stopRecording();
-			var zip = new JSZip();
-			for (var i = 0; i < imgArray.length; i++) {
-				var filename = "seq" + pad(i+1, 6) + ".png";
-				zip.file(filename, imgArray[i].split(',')[1], {base64: true});
-			}
-			zip.generateAsync({type:"blob"})
-			.then(function(content) {
-				saveAs(content, "canvas_images.zip");
-			});
-			imgArray = [];
-			updateNumImages();
-		}
-
-		function pad(num, size) {
-			var s = num.toString();
-			while (s.length < size) {
-				s = "0" + s;
-			}
-			return s;
-		}
-
-		function updateNumImages() {
-			document.getElementById("numImages").textContent = imgArray.length;
-		}
-	</script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
+                document.getElementById("playButton").disabled = false;
+                document.getElementById("stopButton").disabled = false;
+                document.getElementById("clearCanvas").disabled = false;
+            };
+        });
+    </script>
 </body>
 </html>
