@@ -15,9 +15,9 @@
 	<br>
 	<label for="scriptTypeSelect">Script Type:</label>
 <select id="scriptTypeSelect" onchange="generateScriptOptions()">
-    <option value="Script">Script</option>
-    <option value="Test">Test</option>
-    <option value="Trash">Trash</option>
+    <option value="script">Script</option>
+    <option value="test">Test</option>
+    <option value="trash">Trash</option>
 </select>
 
 	<label for="scriptSelect">Select Script:</label>
@@ -64,7 +64,7 @@ function generateScriptOptions() {
     
     for (let i = 0; i < numberOfScripts; i++) {
         const scriptNumber = String(i).padStart(3, "0");
-        const scriptFilename = `https://dragonfarts.github.io/HTML-Stable-Releases/CanvasScripto/${scriptType}${scriptNumber}.js`;
+        const scriptFilename = `${scriptType}${scriptNumber}.js`;
 
         const option = document.createElement("option");
         option.value = scriptFilename;
