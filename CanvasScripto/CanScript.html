@@ -49,6 +49,16 @@
 	<label for="fpsInput">Images per second:</label>
 	<input type="number" id="fpsInput" min="1" max="10000" value="30">
 	<p>Number of images in array: <span id="numImages"></span></p>
+	    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            for (let i = 1; i <= 38; i++) {
+                let script = document.createElement('script');
+                let scriptNumber = String(i).padStart(3, '0');
+                script.src = `https://dragonfarts.github.io/HTML-Stable-Releases/CanvasScripto/script${scriptNumber}.js`;
+                document.head.appendChild(script);
+            }
+        });
+    </script>
 	<script src="script001.js" id="script"></script>
 	<script>
 		var imgArray = [];
