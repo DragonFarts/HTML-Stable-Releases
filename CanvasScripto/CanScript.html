@@ -15,9 +15,9 @@
 	<br>
 	<label for="scriptTypeSelect">Script Type:</label>
 <select id="scriptTypeSelect" onchange="generateScriptOptions()">
-    <option value="script">Script</option>
-    <option value="test">Test</option>
-    <option value="trash">Trash</option>
+    <option value="Script">script</option>
+    <option value="Test">test</option>
+    <option value="Trash">trash</option>
 </select>
 
 	<label for="scriptSelect">Select Script:</label>
@@ -48,7 +48,7 @@
 	<label for="fpsInput">Images per second:</label>
 	<input type="number" id="fpsInput" min="1" max="10000" value="30">
 	<p>Number of images in array: <span id="numImages"></span></p>
-	<script src="script001.js" id="script"></script>
+	<script src="/script001.js" id="script"></script>
 	<script>
 		var imgArray = [];
 		var intervalId;
@@ -58,20 +58,34 @@
 function generateScriptOptions() {
     const scriptSelect = document.getElementById("scriptSelect");
     const scriptTypeSelect = document.getElementById("scriptTypeSelect");
-    const scriptType = scriptTypeSelect.value;
-    
+    const scriptType = scriptTypeSelect.value.toLowerCase(); // make the scriptType lowercase
+
     scriptSelect.innerHTML = ""; // clear existing options
-    
+
     for (let i = 0; i < numberOfScripts; i++) {
         const scriptNumber = String(i).padStart(3, "0");
-        const scriptFilename = `${scriptType}${scriptNumber}.js`;
+        const scriptFilename = `https://dragonfarts.github.io/HTML-Stable-Releases/CanvasScripto/${scriptType}${scriptNumber}.js`;
 
         const option = document.createElement("option");
         option.value = scriptFilename;
         option.textContent = scriptFilename;
+        option.dataset.filename = scriptFilename; // add filename data attribute
         scriptSelect.appendChild(option);
     }
+
+    // add event listener to set the script src based on the selected option's data-filename attribute
+    scriptSelect.addEventListener('change', function() {
+        const select = document.getElementById("scriptSelect");
+        const script = document.getElementById("script");
+        script.parentNode.removeChild(script);
+        script = document.createElement("script");
+        script.src = select.options[select.selectedIndex].dataset.filename; // use filename from data attribute
+        script.id = "script";
+        document.head.appendChild(script);
+    });
 }
+
+
 
 		generateScriptOptions();
 
@@ -91,15 +105,17 @@ function generateScriptOptions() {
 			clearCanvas();
 		}
 
-		function loadScript() {
-			var select = document.getElementById("scriptSelect");
-			var script = document.getElementById("script");
-			script.parentNode.removeChild(script);
-			script = document.createElement("script");
-			script.src = select.value;
-			script.id = "script";
-			document.head.appendChild(script);
-		}
+function loadScript() {
+    var select = document.getElementById("scriptSelect");
+    var script = document.getElementById("script");
+    script.parentNode.removeChild(script);
+    script = document.createElement("script");
+    var filename = select.value.toLowerCase(); // ensure filename is lowercase
+    script.src = filename;
+    script.id = "script";
+    document.head.appendChild(script);
+}
+
 
 		function clearCanvas() {
 			var canvas = document.getElementById("myCanvas");
