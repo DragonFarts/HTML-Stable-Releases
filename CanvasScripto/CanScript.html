@@ -48,30 +48,30 @@
 	<label for="fpsInput">Images per second:</label>
 	<input type="number" id="fpsInput" min="1" max="10000" value="30">
 	<p>Number of images in array: <span id="numImages"></span></p>
-	<script src="script001.js" id="script"></script>
+	<script src="/script001.js" id="script"></script>
 	<script>
 		var imgArray = [];
 		var intervalId;
 
 		const numberOfScripts = 33;
 
-		function generateScriptOptions() {
-			const scriptSelect = document.getElementById("scriptSelect");
-			const scriptTypeSelect = document.getElementById("scriptTypeSelect");
-			const scriptType = scriptTypeSelect.value;
+function generateScriptOptions() {
+    const scriptSelect = document.getElementById("scriptSelect");
+    const scriptTypeSelect = document.getElementById("scriptTypeSelect");
+    const scriptType = scriptTypeSelect.value;
+    
+    scriptSelect.innerHTML = ""; // clear existing options
+    
+    for (let i = 0; i < numberOfScripts; i++) {
+        const scriptNumber = String(i).padStart(3, "0");
+        const scriptFilename = `${scriptType}${scriptNumber}.js`;
 
-
-
-			for (let i = 0; i < numberOfScripts; i++) {
-				const scriptNumber = String(i).padStart(3, "0");
-				const scriptFilename = `${scriptType}${scriptNumber}.js`;
-
-				const option = document.createElement("option");
-				option.value = scriptFilename;
-				option.textContent = scriptFilename;
-				scriptSelect.appendChild(option);
-			}
-		}
+        const option = document.createElement("option");
+        option.value = scriptFilename;
+        option.textContent = scriptFilename;
+        scriptSelect.appendChild(option);
+    }
+}
 
 		generateScriptOptions();
 
