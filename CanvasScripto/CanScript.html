@@ -48,7 +48,7 @@
 	<label for="fpsInput">Images per second:</label>
 	<input type="number" id="fpsInput" min="1" max="10000" value="30">
 	<p>Number of images in array: <span id="numImages"></span></p>
-	<script src="https://dragonfarts.github.io/HTML-Stable-Releases/CanvasScripto/script001.js" id="script"></script>
+	<script src="script001.js" id="script"></script>
 	<script>
 		var imgArray = [];
 		var intervalId;
@@ -64,7 +64,7 @@ function generateScriptOptions() {
     
     for (let i = 0; i < numberOfScripts; i++) {
         const scriptNumber = String(i).padStart(3, "0");
-        const scriptFilename = `${scriptType}${scriptNumber}.js`;
+        const scriptFilename = `https://dragonfarts.github.io/HTML-Stable-Releases/CanvasScripto/${scriptType}${scriptNumber}.js`;
 
         const option = document.createElement("option");
         option.value = scriptFilename;
